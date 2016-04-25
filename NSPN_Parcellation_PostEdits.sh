@@ -15,27 +15,30 @@
 #                  and themselves contain directories called SURFER
 #                  and MPM.
 #    occ       : The scan occasion. One of baseline, CBSU, UCL and 
-#                  WBIC.
+#                  WBIC. This directory contains the output of 
+#                  recon-all and is found inside the subject's SURFER
+#                  directory.
 #
 # EXPECTS:
-#    All the output files from recon-all should exist.
+#    All the output files from recon-all should exist in the 
+#      realavent occasion directory in the subject's SURFER 
+#      directory.
+#    All quality control editing should have been conducted.
 #    The fsaverageSubP directory containing the standard space 
 #      parcellation should exist inside the SUB_DATA directory.
 #
 # OUTPUTS:
-#    All output are in the same directory as the input file.
-#    A sub-directory called PDw_bet is created and contains all the
-#      files created by FSL's bet command
-#
-#       R1_head.nii.gz     R1_brain.nii.gz
-#       R2s_head.nii.gz    R2s_brain.nii.gz
-#       MT_head.nii.gz     MT_brain.nii.gz
-#       A_head.nii.gz      A_brain.nii.gz
+#    The following files are created inside the relavent occasion
+#      directory in the subject's SURFER directory
+# 
+#        parcellation/500.aparc.nii.gz
+#        label/lh.500.aparc.annot
+#        label/rh.500.aparc.annot
 #
 #====================================================================
 
 #====================================================================
-# USAGE: Parcellation_PostEdits.sh <study_dir> <sub> <occ>
+# USAGE: NSPN_Parcellation_PostEdits.sh <study_dir> <sub> <occ>
 #====================================================================
 function usage {
 
@@ -43,14 +46,15 @@ function usage {
     echo "       <study_dir> is the parent directory to the SUB_DATA"
     echo "         directory and expects to find SUB_DATA inside it"
     echo "         and then the standard NSPN directory structure."
-    echo "       <sub> is the subject ID that corresponds to a folder"
-    echo "         in the SUB_DATA directory."
+    echo "       <sub> is the subject ID that corresponds to a"
+    echo "          folder in the SUB_DATA directory."
     echo "       <occ> is the scan occasion and is one of baseline,"
     echo "         CBSU, WBIC and UCL"
     echo ""
-    echo "DESCRIPTION: This code creates the parcellation for each person"
-    echo "             in their freesurfer space, and should be applied"
-    echo "             after recon-all edits have been completed"
+    echo "DESCRIPTION: This code creates the parcellation for each"
+    echo "             person in their freesurfer space, and should"
+    echo "             be applied after recon-all edits have been"
+    echo "             completed"
     exit
 }
 
@@ -77,15 +81,15 @@ if [[ -z ${occ} ]]; then
     usage
 fi
     
-#================================================================
+#====================================================================
 # Set some useful variables
-#================================================================
+#====================================================================
 sub_data_dir=${study_dir}/SUB_DATA
 fsaverage_subid=fsaverageSubP
 
-#================================================================
+#====================================================================
 # Transform the fsaverage parcellations
-#================================================================
+#====================================================================
    
 SUBJECTS_DIR=${sub_data_dir}
 subjid=${occ}
