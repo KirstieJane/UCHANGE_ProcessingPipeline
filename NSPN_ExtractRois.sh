@@ -123,10 +123,20 @@ for measure in FA MD MO L1 L23; do
 
     measure_file_dti=${surfer_dir}/dmri/dtifit_${measure}.nii.gz
     
-    # If the file doesn't exist, then skip on to the next one!
+    # If the FA file doesn't exist, then just skip this whole 
+    # section!
     if [[ ! -f ${measure_file_dti} ]]; then 
         echo "No ${measure} file in dmri folder - skipping"
-        continue
+        break
+    fi
+
+    # If you're working with the L23 measure you'll need 
+    # to make it first
+    if [[ ! -f ${measure_file_dti} && ${measure} == "L23" ]]; then
+        fslmaths ${measure_file_dti/L23.nii/L2.nii} \
+                 -add ${measure_file_dti/L23.nii/L3.nii} \
+                 -div 2 \
+                 ${measure_file_dti}
     fi
     
     # If the measure file has particularly small values
