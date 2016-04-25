@@ -11,9 +11,12 @@
 #      brain extracted versions of the MPM images (where all voxels outside of
 #      the brain have been set to zero.
 #
+# USAGE:
+#    NSPN_mpm_bet_mask.sh <pdw_file>
+#
 # INPUTS:
-#    f_PDw : Proton density weighted file to which the MPM 
-#             quantitative maps are aligned.
+#    pdw_file : Proton density weighted file to which the MPM 
+#                 quantitative maps are aligned.
 #
 # EXPECTS:
 #    The following files should be in the same directory as the 
@@ -32,18 +35,17 @@
 #       MT_head.nii.gz     MT_brain.nii.gz
 #       A_head.nii.gz      A_brain.nii.gz
 #
-# 
 #====================================================================
 
 #====================================================================
 # Check the input file is there
 #====================================================================
-f_pdw=$1
+pdw_file=$1
 
 if [[ ! -f ${pdw_file} ]]; then
     echo "PDw file does not exist"
     echo "Check ${pdw_file}"
-    echo "USAGE: mpm_bet_masking.sh <pdw_file>"
+    echo "USAGE: NSPN_mpm_bet_masking.sh <pdw_file>"
     exit    
 fi 
 
