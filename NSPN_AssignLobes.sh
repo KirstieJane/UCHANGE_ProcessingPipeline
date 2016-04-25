@@ -10,9 +10,6 @@
 #    For more information see: 
 #      https://surfer.nmr.mgh.harvard.edu/fswiki/CorticalParcellation
 #
-# USAGE:
-#    NSPN_AssignLobes.sh <surfer_dir>
-#
 # INPUTS:
 #    study_dir : The directory containing the SUB_DATA folder which
 #                  itself contains directories named by sub_id.
@@ -25,19 +22,15 @@
 #                  directory.
 #
 # EXPECTS:
-#    The LobesStrictLUT.txt file should be in the same directory as 
-#      this script.
 #    Recon-all and quality control edits must have been completed.
 #
 # OUTPUTS:
-#    All output are in the same directory as the input file.
-#    A sub-directory called PDw_bet is created and contains all the
-#      files created by FSL's bet command
-#
-#       R1_head.nii.gz     R1_brain.nii.gz
-#       R2s_head.nii.gz    R2s_brain.nii.gz
-#       MT_head.nii.gz     MT_brain.nii.gz
-#       A_head.nii.gz      A_brain.nii.gz
+#    The following files are created inside the relavent occasion
+#      directory in the subject's SURFER directory
+# 
+#        mri/lobes+aseg.mgz
+#        label/lh.lobesStrict.annot
+#        label/rh.lobesStrict.annot
 #
 #====================================================================
 
@@ -102,11 +95,10 @@ fi
 # Set the subjects dir and subject id variables
 SUBJECTS_DIR=${surfer_dir}/../
 surf_sub=${occ}
-lobes_ctab=`dirname ${0}`/LobesStrictLUT.txt
 
-#=============================================================================
+#====================================================================
 # COMBINE LABELS
-#=============================================================================
+#====================================================================
 # First you have to pull together the labels
 # from the surface annotation files
 for hemi in lh rh; do
@@ -118,9 +110,9 @@ for hemi in lh rh; do
     fi
 done
 
-#=============================================================================
+#====================================================================
 # LABEL WHITE MATTER
-#=============================================================================
+#====================================================================
 # Transform the surface annotation into a segmentation volume
 # and label the white matter up to 5mm beneath the lobes
 if [[ ! -f ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
@@ -132,4 +124,6 @@ if [[ ! -f ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
                 --o ${surfer_dir}/mri/lobes+aseg.mgz
 fi
 
-
+#====================================================================
+# All done!
+#====================================================================

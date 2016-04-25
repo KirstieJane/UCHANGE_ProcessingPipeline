@@ -1,19 +1,44 @@
 #!/bin/bash
 
-#==============================================================================
-# Extract DTI and MPM measures from freesurfer ROIs
-# along with surface parameters from various parcellations
-# Created by Kirstie Whitaker
-# Contact kw401@cam.ac.uk
-#==============================================================================
+#====================================================================
+# Created by Kirstie Whitaker on 25th April 2016 
+#
+# DESCRIPTION:
+#    This code takes a freesurfer directory and it's fellow MPM 
+#      directory and extracts statistics from the following 
+#      segmentations and parcellations for all MPM and DTI measures.
+#    Segmentations:
+#      
+#    Parcellations:
+#
+# INPUTS:
+#    study_dir : The directory containing the SUB_DATA folder which
+#                  itself contains directories named by sub_id.
+#    sub_id    : Subject ID. These folders should be inside SUB_DATA
+#                  and themselves contain directories called SURFER
+#                  and MPM.
+#    occ       : The scan occasion. One of baseline, CBSU, UCL and 
+#                  WBIC. This directory contains the output of 
+#                  recon-all and is found inside the subject's SURFER
+#                  directory.
+#
+# EXPECTS:
+#    Recon-all, trac-all (if appropriate) and quality control edits  
+#      must have been completed.
+#    NSPN_mpm_bet_mask.sh must also have been completed and the MPM
+#      directory should be inside the subject's directory at the same
+#      level as the SURFER dir.
+#
+# OUTPUTS:
+#
+#====================================================================
 
-#==============================================================================
-# Define the usage function
-#==============================================================================
-
+#====================================================================
+# USAGE: NSPN_ExtractRois.sh <study_dir> <sub> <occ>
+#====================================================================
 function usage {
 
-    echo "USAGE: freesurfer_extract_rois.sh <data_dir> <subid> <occ>"
+    echo "USAGE: NSPN_ExtractRois.sh <study_dir> <sub> <occ>"
     echo "Note that data dir expects to find SUB_DATA within it"
     echo "and then the standard NSPN directory structure"
     echo ""
@@ -26,16 +51,16 @@ function usage {
     exit
 }
 
-#=============================================================================
+#====================================================================
 # CHECK INPUTS
-#=============================================================================
+#====================================================================
 data_dir=$1
 sub=$2
 occ=$3
 
-# This needs to be in the same directory as this script
-# Fine if you download the git repository but not fine 
-# if you've only take the script itself!
+# These colour look up tables need to be in the same directory as 
+# this script. They're in the UCHANGE_ProcessingPipeline github 
+# repository.
 lobes_ctab=`dirname ${0}`/LobesStrictLUT.txt
 parc500_ctab=`dirname ${0}`/parc500LUT.txt
 
@@ -49,9 +74,21 @@ if [[ -z ${sub} ]]; then
     print_usage=1
 fi
 
+if [[ -z ${occ} ]]; then
+    echo "No occ provided"
+    print_usage=1
+fi
+
 if [[ ! -f ${lobes_ctab} ]]; then
     echo "Can't find lobes color look up table file"
     echo "Check that LobesStrictLUT.txt is in the same directory"
+    echo "as this script"
+    print_usage=1
+fi
+
+if [[ ! -f ${parc500_ctab} ]]; then
+    echo "Can't find parc500 color look up table file"
+    echo "Check that parc500LUT.txt is in the same directory"
     echo "as this script"
     print_usage=1
 fi
@@ -63,10 +100,8 @@ fi
 #=============================================================================
 # SET A COUPLE OF USEFUL VARIABLES
 #=============================================================================
-surfer_dir=${data_dir}/SUB_DATA/${sub}/SURFER/MRI${occ}/
-dti_dir=${data_dir}/SUB_DATA/${sub}/DTI/MRI${occ}/
-reg_dir=${data_dir}/SUB_DATA/${sub}/REG/MRI${occ}/
-mpm_dir=${data_dir}/SUB_DATA/${sub}/MPM/MRI${occ}/
+surfer_dir=${data_dir}/SUB_DATA/${sub}/SURFER/${occ}/
+mpm_dir=${data_dir}/SUB_DATA/${sub}/MPM/{occ}/
 
 SUBJECTS_DIR=${surfer_dir}/../
 surf_sub=`basename ${surfer_dir}`
@@ -78,37 +113,29 @@ if [[ ! -f ${surfer_dir}/mri/T1.mgz ]]; then
     exit
 fi
     
-#=============================================================================
-# REGISTER B0 TO FREESURFER SPACE
-#=============================================================================
-# The first step is ensuring that the dti_ec (B0) file
-# has been registered to freesurfer space
-if [[ ! -f ${reg_dir}/diffB0_TO_surf.dat ]]; then
-    bbregister --s ${surf_sub} \
-               --mov ${dti_dir}/dti_ec.nii.gz \
-               --init-fsl \
-               --reg ${reg_dir}/diffB0_TO_surf.dat \
-               --t2
-fi
 
-#=============================================================================
+#====================================================================
 # TRANSFORM DTI MEASURES FILES TO FREESURFER SPACE
-#=============================================================================
-# If the dti measure file doesn't exist yet in the <surfer_dir>/mri folder
-# then you have to make it
-for measure in FA MD MO L1 L23 sse; do
+#====================================================================
+# If the dti measure file doesn't exist yet in the 
+# <surfer_dir>/mri folder then you have to make it
+for measure in FA MD MO L1 L23; do
 
-    measure_file_dti=`ls -d ${dti_dir}/FDT/*_${measure}.nii.gz 2> /dev/null`
+    measure_file_dti=${surfer_dir}/dmri/dtifit_${measure}.nii.gz
+    
+    # If the file doesn't exist, then skip on to the next one!
     if [[ ! -f ${measure_file_dti} ]]; then 
-        echo "${measure} file doesn't exist in dti_dir, please check"
-        usage
+        echo "No ${measure} file in dmri folder - skipping"
+        continue
     fi
     
     # If the measure file has particularly small values
     # then multiply this file by 1000 first
     if [[ "MD L1 L23" =~ ${measure} ]]; then
         if [[ ! -f ${measure_file_dti/.nii/_mul1000.nii} ]]; then
-            fslmaths ${measure_file_dti} -mul 1000 ${measure_file_dti/.nii/_mul1000.nii}
+            fslmaths ${measure_file_dti} \
+                      -mul 1000 \
+                      ${measure_file_dti/.nii/_mul1000.nii}
         fi
         measure_file_dti=${measure_file_dti/.nii/_mul1000.nii}
     fi
@@ -144,7 +171,9 @@ for mpm in R1 MT R2s A; do
         # then multiply this file by 1000 first
         if [[ ${mpm} == "R2s" || ${mpm} == "MT" ]]; then
             if [[ ! -f ${mpm_file/.nii/_mul1000.nii} ]]; then
-                fslmaths ${mpm_file} -mul 1000 ${mpm_file/.nii/_mul1000.nii}
+                fslmaths ${mpm_file} \
+                         -mul 1000 \
+                         ${mpm_file/.nii/_mul1000.nii}
             fi
             mpm_file=${mpm_file/.nii/_mul1000.nii}
         fi
@@ -159,6 +188,8 @@ for mpm in R1 MT R2s A; do
         fi
     fi
 done
+
+exit
     
 #=============================================================================
 # EXTRACT THE STATS FROM THE SEGMENTATION FILES
