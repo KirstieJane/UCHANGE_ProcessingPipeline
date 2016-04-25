@@ -147,7 +147,7 @@ for measure in FA MD MO L1 L23; do
         mri_vol2vol --mov ${measure_file_dti} \
                     --targ ${surfer_dir}/mri/T1.mgz \
                     --o ${surfer_dir}/mri/${measure}.mgz \
-                    --fsl ${surfer_dir}/dmri/xmfs/diff2anatorig.bbr.mat \
+                    --fsl ${surfer_dir}/dmri/xfms/diff2anatorig.bbr.mat \
                     --no-save-reg
 
     else
