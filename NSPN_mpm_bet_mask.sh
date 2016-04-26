@@ -62,6 +62,8 @@ calc_filename_list=(A MT R1 R2s)
 #====================================================================
 # First convert all the input files to .nii.gz
 # and make sure they're in FSL standard orientation
+# I don't know how to check this so we're going to do it for
+# all the files, even if the directory has already been processed
 #====================================================================
 echo -n "  Reorienting"
 for f_name in ${orig_filename_list[@]} ${calc_filename_list[@]}; do
@@ -80,10 +82,17 @@ echo ""
 mkdir -p ${bet_dir}
   
 echo "  Conducting brain and head extraction"
-bet ${mpm_dir}/PDw.nii.gz ${bet_dir}/PDw_brain.nii.gz -A
+
+# Run brain extraction with the -A flag to get skull and
+# scalp images too
+if [[ ! -f ${mpm_dir}/PDw_brain.nii.gz ]]; then
+    bet ${mpm_dir}/PDw.nii.gz ${bet_dir}/PDw_brain.nii.gz -A
+fi
 
 # Erode the brain mask by 3mm
-fslmaths ${bet_dir}/PDw_brain.nii.gz -ero ${bet_dir}/PDw_brain_ero3.nii.gz
+if [[ ! -f ${mpm_dir}/PDw_brain_ero3.nii.gz ]]; then
+    fslmaths ${bet_dir}/PDw_brain.nii.gz -ero ${bet_dir}/PDw_brain_ero3.nii.gz
+fi
             
 #====================================================================
 # Now make the brain and head files for each of the
@@ -91,17 +100,20 @@ fslmaths ${bet_dir}/PDw_brain.nii.gz -ero ${bet_dir}/PDw_brain_ero3.nii.gz
 #====================================================================
 echo -n "  Applying masks"
 for f_name in PDw ${calc_filename_list[@]}; do
-    echo -n " - ${f_name}"
-    fslmaths ${bet_dir}/PDw_brain_ero3.nii.gz \
-                -bin \
-                -mul ${mpm_dir}/${f_name}.nii.gz \
-                ${mpm_dir}/${f_name}_brain.nii.gz
-                
-    fslmaths ${bet_dir}/ \
-                -bin \
-                -mul ${mpm_dir}/${f_name}.nii.gz \
-                ${mpm_dir}/${f_name}_head.nii.gz
 
+    # Don't run if it's already complete!
+    if [[ ! -f ${mpm_dir}/${f_name}_head.nii.gz ]]; then
+        echo -n " - ${f_name}"
+        fslmaths ${bet_dir}/PDw_brain_ero3.nii.gz \
+                    -bin \
+                    -mul ${mpm_dir}/${f_name}.nii.gz \
+                    ${mpm_dir}/${f_name}_brain.nii.gz
+                    
+        fslmaths ${bet_dir}/ \
+                    -bin \
+                    -mul ${mpm_dir}/${f_name}.nii.gz \
+                    ${mpm_dir}/${f_name}_head.nii.gz
+    fi
 done # Close the mpm calculated file loop
 echo ""
 
