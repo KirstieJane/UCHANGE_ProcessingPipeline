@@ -109,7 +109,7 @@ for f_name in PDw ${calc_filename_list[@]}; do
                     -mul ${mpm_dir}/${f_name}.nii.gz \
                     ${mpm_dir}/${f_name}_brain.nii.gz
                     
-        fslmaths ${bet_dir}/ \
+        fslmaths ${bet_dir}/PDw_brain_outskin_mask.nii.gz \
                     -bin \
                     -mul ${mpm_dir}/${f_name}.nii.gz \
                     ${mpm_dir}/${f_name}_head.nii.gz
