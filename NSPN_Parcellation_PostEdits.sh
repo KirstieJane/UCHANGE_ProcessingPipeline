@@ -82,10 +82,15 @@ if [[ -z ${occ} ]]; then
 fi
     
 #====================================================================
-# Set some useful variables
+# SET A COUPLE OF USEFUL VARIABLES
 #====================================================================
 sub_data_dir=${study_dir}/SUB_DATA
 fsaverage_subid=fsaverageSubP
+
+#====================================================================
+# PRINT TO SCREEN WHAT WE'RE DOING
+#====================================================================
+echo "==== Create 500 Parcellation ===="
 
 #====================================================================
 # Transform the fsaverage parcellations
@@ -99,6 +104,7 @@ for hemi in lh rh; do
     
     if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.500.aparc.annot ]]; then
     
+        echo "    Creating 500 parcellation (${hemi})"
         # Transform the surface parcellation from fsaverage space 
         # to indiviual native space
         mri_surf2surf --srcsubject ${fsaverage_subid} \
@@ -106,17 +112,24 @@ for hemi in lh rh; do
                         --trgsubject ${sub}/SURFER/${subjid} \
                         --trgsurfval ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.500.aparc \
                         --hemi ${hemi}
+    else
+        echo "    ${hemi} 500 parcellation already created"
     fi
 done
 
 if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/500.aparc.nii.gz ]]; then
+
     # Transform indivual surface parcellation to individual volume parcellation
+    echo "    Creating 500 parcellation volume"
     mkdir -p ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/
     mri_aparc2aseg --s ${sub}/SURFER/${subjid} \
                     --o ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/500.aparc.nii.gz \
                     --annot 500.aparc \
                     --rip-unknown \
                     --hypo-as-wm
+else
+    echo "    500 parcellation volume already created"
+
 fi
 
 #====================================================================

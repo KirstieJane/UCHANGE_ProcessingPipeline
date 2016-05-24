@@ -97,16 +97,25 @@ SUBJECTS_DIR=${surfer_dir}/../
 surf_sub=${occ}
 
 #====================================================================
+# PRINT TO SCREEN WHAT WE'RE DOING
+#====================================================================
+echo "==== Assign Lobes ===="
+
+#====================================================================
 # COMBINE LABELS
 #====================================================================
 # First you have to pull together the labels
 # from the surface annotation files
 for hemi in lh rh; do
-    if [[ ! -f ${surfer_dir}/label/${hemi}.lobesStrict ]]; then
+    if [[ ! -f ${surfer_dir}/label/${hemi}.lobesStrict.annot ]]; then
+
+        echo "    Assigning lobe labels (${hemi})"
         mri_annotation2label --subject ${surf_sub} \
                              --hemi ${hemi} \
                              --lobesStrict \
                              ${surfer_dir}/label/${hemi}.lobesStrict
+    else
+        echo "    ${hemi} lobe labels already assigned"
     fi
 done
 
@@ -117,11 +126,15 @@ done
 # and label the white matter up to 5mm beneath the lobes
 if [[ ! -f ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
 
+    echo "    Assigning white matter 5mm below cortical surface to lobe labes"
+
     mri_aparc2aseg --s ${surf_sub} \
                 --labelwm \
                 --rip-unknown \
                 --annot lobesStrict \
                 --o ${surfer_dir}/mri/lobes+aseg.mgz
+else
+    echo "    White matter 5mm below cortical surface already assigned to lobe"
 fi
 
 #====================================================================

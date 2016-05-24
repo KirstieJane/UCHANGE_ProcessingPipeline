@@ -4,9 +4,11 @@
 # Created by Kirstie Whitaker on 25th April 2016 
 #
 # DESCRIPTION:
-#    This code takes a freesurfer directory and it's fellow MPM 
-#      directory and extracts statistics from the following 
-#      segmentations and parcellations for all MPM and DTI measures.
+#    This code takes a freesurfer directory (including the 
+#      transformed MPM and DTI measures) and extracts statistics 
+#      from the following segmentations and parcellations for all
+#      MPM and DTI measures along with the standard freesurfer
+#      morphological measures.
 #    Segmentations:
 #      
 #    Parcellations:
@@ -23,11 +25,11 @@
 #                  directory.
 #
 # EXPECTS:
-#    Recon-all, trac-all (if appropriate) and quality control edits  
-#      must have been completed.
-#    NSPN_mpm_bet_mask.sh must also have been completed and the MPM
-#      directory should be inside the subject's directory at the same
-#      level as the SURFER dir.
+#    Recon-all, trac-all and quality control edits must have been   
+#      completed.
+#    NSPN_TransformQuantitativeMaps.sh, NSPN_Parcellation.sh, 
+#      NSPN_AssignLobes.sh and NSPN_ResampleSurfaces.sh must also
+#      have been completed.
 #
 # OUTPUTS:
 #
@@ -42,12 +44,11 @@ function usage {
     echo "Note that data dir expects to find SUB_DATA within it"
     echo "and then the standard NSPN directory structure"
     echo ""
-    echo "DESCRIPTION: This code will register the DTI B0 file to freesurfer space,"
-    echo "apply this registration to the DTI measures in the <dti_dir>/FDT folder,"
-    echo "transform the MPM files to freesurfer space," 
-    echo "and then create the appropriate <measure>_wmparc.stats and "
-    echo "<measure>_aseg.stats files for each subject separately"
-    echo "Finally, it will also extract surface stats from the parcellation schemes"
+    echo "DESCRIPTION: This code takes a freesurfer directory (including the,"
+    echo "transformed MPM and DTI measures) and extracts statistics"
+    echo "from the following segmentations and parcellations for all" 
+    echo "MPM and DTI measures along with the standard freesurfer"
+    echo "morphological measures."
     exit
 }
 
@@ -101,107 +102,24 @@ fi
 # SET A COUPLE OF USEFUL VARIABLES
 #=============================================================================
 surfer_dir=${data_dir}/SUB_DATA/${sub}/SURFER/${occ}/
-mpm_dir=${data_dir}/SUB_DATA/${sub}/MPM/{occ}/
+mpm_dir=${data_dir}/SUB_DATA/${sub}/MPM/${occ}/
 
 SUBJECTS_DIR=${surfer_dir}/../
 surf_sub=`basename ${surfer_dir}`
+
+
+#====================================================================
+# PRINT TO SCREEN WHAT WE'RE DOING
+#====================================================================
+echo "==== Extract ROIS ===="
 
 #=============================================================================
 # DON'T BOTHER IF THERE'S NO DATA!
 #=============================================================================
 if [[ ! -f ${surfer_dir}/mri/T1.mgz ]]; then
+    echo "No T1.mgz file in surfer directory. Exiting"
     exit
 fi
-    
-
-#====================================================================
-# TRANSFORM DTI MEASURES FILES TO FREESURFER SPACE
-#====================================================================
-# If the dti measure file doesn't exist yet in the 
-# <surfer_dir>/mri folder then you have to make it
-for measure in FA MD MO L1 L23; do
-
-    measure_file_dti=${surfer_dir}/dmri/dtifit_${measure}.nii.gz
-    
-    # If the file doesn't exist, then just skip this whole 
-    # section!
-    if [[ ! -f ${measure_file_dti} && ${measure} != "L23" ]]; then 
-        echo "No ${measure} file in dmri folder - skipping"
-        continue
-    elif [[ ! -f ${measure_file_dti} && ${measure} == "L23" ]]; then 
-        if [[ -f ${measure_file_dti/L23.nii/L2.nii} ]]; then
-            fslmaths ${measure_file_dti/L23.nii/L2.nii} \
-                 -add ${measure_file_dti/L23.nii/L3.nii} \
-                 -div 2 \
-                 ${measure_file_dti}
-              
-        else
-            echo "No L2 file in dmri folder - skipping"
-            continue
-        fi
-    fi
-    
-    # If the measure file has particularly small values
-    # then multiply this file by 1000 first
-    if [[ "MD L1 L23" =~ ${measure} ]]; then
-        if [[ ! -f ${measure_file_dti/.nii/_mul1000.nii} ]]; then
-            fslmaths ${measure_file_dti} \
-                      -mul 1000 \
-                      ${measure_file_dti/.nii/_mul1000.nii}
-        fi
-        measure_file_dti=${measure_file_dti/.nii/_mul1000.nii}
-    fi
-    
-    # Now transform this file to freesurfer space
-    if [[ ! -f ${surfer_dir}/mri/${measure}.mgz ]]; then
-        
-        echo "    Registering ${measure} file to freesurfer space"
-        mri_vol2vol --mov ${measure_file_dti} \
-                    --targ ${surfer_dir}/mri/T1.mgz \
-                    --o ${surfer_dir}/mri/${measure}.mgz \
-                    --fsl ${surfer_dir}/dmri/xfms/diff2anatorig.bbr.mat \
-                    --no-save-reg
-
-    else
-        echo "    ${measure} file already in freesurfer space"
-       
-    fi
-done
-
-#=============================================================================
-# TRANSFORM MPM MEASURES FILES TO FREESURFER SPACE
-#=============================================================================
-# If the mpm measure file doesn't exist yet in the <surfer_dir>/mri folder
-# then you have to make it
-
-# Loop through the mpm outputs that you're interested in
-for mpm in R1 MT R2s A; do
-    mpm_file=${mpm_dir}/${mpm}_head.nii.gz
-
-    if [[ -f ${mpm_file} ]]; then
-        # If the measure file has particularly small values
-        # then multiply this file by 1000 first
-        if [[ ${mpm} == "R2s" || ${mpm} == "MT" ]]; then
-            if [[ ! -f ${mpm_file/.nii/_mul1000.nii} ]]; then
-                fslmaths ${mpm_file} \
-                         -mul 1000 \
-                         ${mpm_file/.nii/_mul1000.nii}
-            fi
-            mpm_file=${mpm_file/.nii/_mul1000.nii}
-        fi
-        
-        if [[ ! -f ${surfer_dir}/mri/${mpm}.mgz ]]; then
-            # Align the mgz file to "freesurfer" anatomical space
-            mri_vol2vol --mov ${mpm_file} \
-                        --targ ${surfer_dir}/mri/T1.mgz \
-                        --regheader \
-                        --o ${surfer_dir}/mri/${mpm}.mgz \
-                        --no-save-reg
-        fi
-    fi
-done
-
-exit
     
 #=============================================================================
 # EXTRACT THE STATS FROM THE SEGMENTATION FILES
@@ -210,17 +128,14 @@ exit
 #     wmparc
 #     aseg
 #     lobesStrict
-#     500.aparc_cortical_consecutive
-#     500.aparc_cortical_expanded_consecutive_WMoverlap
 #=============================================================================
 
-#for measure in R1 MT R2s A FA MD MO L1 L23 sse synthetic; do
-for measure in R1 MT R2s A FA MD MO L1 L23 sse; do
-#for measure in MT; do
+for measure in R1 MT R2s A FA MD MO L1 L23; do
     if [[ -f ${surfer_dir}/mri/${measure}.mgz ]]; then
         
-        echo "MEASURE: ${measure}"
+        echo -ne "  ${measure} segmentations:\t"
         #=== wmparc
+        echo -n " wmparc"
         if [[ ! -f ${surfer_dir}/stats/${measure}_wmparc.stats ]]; then
             mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
                          --seg ${surfer_dir}/mri/wmparc.mgz \
@@ -228,8 +143,10 @@ for measure in R1 MT R2s A FA MD MO L1 L23 sse; do
                          --sum ${surfer_dir}/stats/${measure}_wmparc.stats \
                          --pv ${surfer_dir}/mri/norm.mgz
         fi
+        echo -n " - done!"
         
         #=== aseg
+        echo -n " aseg"
         if [[ ! -f ${surfer_dir}/stats/${measure}_aseg.stats ]]; then
             mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
                          --seg ${surfer_dir}/mri/aseg.mgz \
@@ -237,8 +154,10 @@ for measure in R1 MT R2s A FA MD MO L1 L23 sse; do
                          --pv ${surfer_dir}/mri/norm.mgz \
                          --ctab ${FREESURFER_HOME}/ASegStatsLUT.txt 
         fi
+        echo -n " - done!"
         
         #=== lobesStrict
+        echo -n " lobesStrict"
         if [[ ! -f ${surfer_dir}/stats/${measure}_lobesStrict.stats ]]; then
             mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
                          --seg ${surfer_dir}/mri/lobes+aseg.mgz \
@@ -247,44 +166,13 @@ for measure in R1 MT R2s A FA MD MO L1 L23 sse; do
                          --ctab ${lobes_ctab}
         
         fi
+        echo " - done!"
         
-        #=== 500.aparc_cortical_consecutive.nii.gz
-        # Extract measures from the cortical regions in the 500 parcellation
-        if [[ ! -f ${surfer_dir}/stats/${measure}_500cortConsec.stats 
-                && -f ${surfer_dir}/parcellation/500.aparc_cortical_consecutive.nii.gz ]]; then
-            mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
-                         --seg ${surfer_dir}/parcellation/500.aparc_cortical_consecutive.nii.gz  \
-                         --sum ${surfer_dir}/stats/${measure}_500cortConsec.stats \
-                         --pv ${surfer_dir}/mri/norm.mgz \
-                         --ctab ${parc500_ctab}
-        fi
-        
-        #=== 500.aparc_cortical_expanded_consecutive_WMoverlap
-        # Only run this if there is a 500 cortical parcellation
-        if [[ ! -f ${surfer_dir}/stats/${measure}_500cortExpConsecWMoverlap.stats \
-                && -f ${surfer_dir}/parcellation/500.aparc_cortical_expanded_consecutive.nii.gz ]]; then
-            
-            # Create the overlap file if it doesn't already exist
-            if [[ ! -f ${surfer_dir}/parcellation/500.aparc_cortical_expanded_consecutive_WMoverlap.nii.gz ]]; then
-            
-                fslmaths ${surfer_dir}/parcellation/500.aparc_whiteMatter.nii.gz \
-                            -bin \
-                            -mul ${surfer_dir}/parcellation/500.aparc_cortical_expanded_consecutive.nii.gz \
-                            ${surfer_dir}/parcellation/500.aparc_cortical_expanded_consecutive_WMoverlap.nii.gz
-            fi
-            
-            mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
-                         --seg ${surfer_dir}/parcellation/500.aparc_cortical_expanded_consecutive_WMoverlap.nii.gz \
-                         --sum ${surfer_dir}/stats/${measure}_500cortExpConsecWMoverlap.stats \
-                         --pv ${surfer_dir}/mri/norm.mgz \
-                         --ctab ${parc500_ctab}
-        fi
-        echo "===="
     else
         echo "${measure} file not transformed to Freesurfer space"
     fi
 done
-    
+
 #=============================================================================
 # EXTRACT THE STATS FROM THE SURFACE PARCELLATION FILES
 #=============================================================================
@@ -294,13 +182,17 @@ done
 #     lobesStrict
 #=============================================================================
 
-# Loop over both left and right hemispheres
-for hemi in lh rh; do
-    # Loop over parcellations
-    for parc in aparc 500.aparc lobesStrict; do
-    #for parc in 500.aparc; do
+# Loop over parcellations
+for parc in aparc 500.aparc lobesStrict; do
+    echo "==== Parc: ${parc} ===="
+
+    # Loop over both left and right hemispheres
+    for hemi in lh rh; do
+        echo "  -- Hemi: ${hemi} --"
 
         # First extract just the thickness & curvature values
+        echo "    Standard parcellations"
+        echo -n "      Extracting stats"
         if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.stats \
                 && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
             mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
@@ -308,103 +200,119 @@ for hemi in lh rh; do
                                     ${surf_sub} \
                                     ${hemi}
         fi
-        
-        # Next loop through all the different MPM and DTI files
-        #for measure in R1 MT R2s A FA MD MO L1 L23 sse synthetic; do
-        for measure in R1 MT R2s A FA MD MO L1 L23 sse; do
-        #for measure in MT; do
 
+        # Also extract sulcal depth
+        if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
+                && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+            mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
+                                    -f ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
+                                    -t sulc \
+                                    ${surf_sub} \
+                                    ${hemi}
+        fi
+        echo " - done!"
+
+        # Next loop through all the different MPM and DTI files
+        for measure in R1 MT R2s A FA MD MO L1 L23; do
+            echo "    ${measure} parcellations "
+
+            # Take the average across all of cortex
+            if [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_cortexAv.mgh ]]; then
+            
+                mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
+                                --o ${surfer_dir}/surf/${hemi}.${measure}_cortexAv.mgh \
+                                --regheader ${surf_sub} \
+                                --projfrac-avg 0 1 0.1 \
+                                --interp nearest \
+                                --surf white \
+                                --hemi ${hemi} 
+            fi
+
+            # Calculate the stats
+            if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats \
+                        && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+                        
+                mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
+                                        -t ${surfer_dir}/surf/${hemi}.${measure}_cortexAv.mgh \
+                                        -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats \
+                                        ${surf_sub} \
+                                        ${hemi}
+            fi
+            
             # Loop through a bunch of different fractional depths 
             # from the white matter surface
-            for frac in `seq -f %+02.2f -1 0.05 1`; do
-            #for frac in `seq -f %+02.2f 0 0.1 1`; do
+            for frac in `seq -f %+02.2f 0.0 0.1 1.0`; do
+                echo -n "      Frac: ${frac}"
 
                 # Project the values to the surface
-                if [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_projfrac${frac}.mgh ]]; then
+                echo -n " Projecting values to surface"
+                if [[ ! -f ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded ]]; then
+                    echo " -- Surface not resampled. Skipping this depth." 
+                    continue
+                elif [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_frac${frac}_expanded.mgh ]]; then
                 
                     mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
-                                    --o ${surfer_dir}/surf/${hemi}.${measure}_projfrac${frac}.mgh \
+                                    --o ${surfer_dir}/surf/${hemi}.${measure}_frac${frac}_expanded.mgh \
                                     --regheader ${surf_sub} \
-                                    --projfrac ${frac} \
                                     --interp nearest \
-                                    --surf white \
+                                    --surf white_frac${frac}_expanded \
                                     --hemi ${hemi} 
                 fi
+                echo -n " - done!"
 
                 # Calculate the stats
-                if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_projfrac${frac}.stats \
+                echo -n " Extracting stats"
+                if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats \
                             && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
                             
                     mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
-                                            -t ${surfer_dir}/surf/${hemi}.${measure}_projfrac${frac}.mgh \
-                                            -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_projfrac${frac}.stats \
+                                            -t ${surfer_dir}/surf/${hemi}.${measure}_frac${frac}_expanded.mgh \
+                                            -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats \
                                             ${surf_sub} \
                                             ${hemi}
                 fi
+                echo " - done!"
         
             done # Close the fraction of cortical thickness loop
-
-            # Now loop through the different absolute depths
-            # **from the pial surface**
-            #for dist in `seq -f %+02.2f -5 0.1 0`; do
-            for dist in `seq -f %+02.2f -0.1 0.1 0`; do
-
-                if [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_projdist${dist}.mgh ]]; then
-                
-                    mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
-                                    --o ${surfer_dir}/surf/${hemi}.${measure}_projdist${dist}.mgh \
-                                    --regheader ${surf_sub} \
-                                    --projdist ${dist} \
-                                    --interp nearest \
-                                    --surf pial \
-                                    --hemi ${hemi} 
-                
-                fi
-
-                # Calculate the stats
-                if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_projdist${dist}.stats \
-                            && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
-                            
-                    mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
-                                            -t ${surfer_dir}/surf/${hemi}.${measure}_projdist${dist}.mgh \
-                                            -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_projdist${dist}.stats \
-                                            ${surf_sub} \
-                                            ${hemi}
-                fi
-                
-            done # Close the absolute distance loop
             
             # Now loop through the different absolute depths
-            # **from the grey/white matter boundary**
-            for dist in `seq -f %+02.2f -2 0.1 0`; do
+            # from the grey/white matter boundary
+            for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
+                echo -n "      Dist: ${dist}"
 
-                if [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_projdist${dist}_fromBoundary.mgh ]]; then
+                # Project the values to the surface
+                echo -n " Projecting values to surface"
+                if [[ ! -f ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded ]]; then
+                    echo " -- Surface not resampled. Skipping this depth." 
+                    continue
+                elif [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_dist${dist}_expanded.mgh ]]; then
                 
                     mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
-                                    --o ${surfer_dir}/surf/${hemi}.${measure}_projdist${dist}_fromBoundary.mgh \
+                                    --o ${surfer_dir}/surf/${hemi}.${measure}_dist${dist}_expanded.mgh \
                                     --regheader ${surf_sub} \
-                                    --projdist ${dist} \
                                     --interp nearest \
-                                    --surf white \
+                                    --surf white_dist${dist}_expanded \
                                     --hemi ${hemi} 
-                
                 fi
+                echo -n " - done!"
 
                 # Calculate the stats
-                if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_projdist${dist}_fromBoundary.stats \
+                echo -n " Extracting stats"
+                if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats \
                             && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
                             
                     mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
-                                            -t ${surfer_dir}/surf/${hemi}.${measure}_projdist${dist}_fromBoundary.mgh \
-                                            -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_projdist${dist}_fromBoundary.stats \
+                                            -t ${surfer_dir}/surf/${hemi}.${measure}_dist${dist}_expanded.mgh \
+                                            -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats \
                                             ${surf_sub} \
                                             ${hemi}
                 fi
-            done # Close the absolute distance **from boundary** loop
+                echo " - done!"
+        
+            done # Close the absolute distance from grey/white matter boundary loop
         done # Close the measure loop
-    done # Close parcellation loop
-done # Close hemi loop
-
+    done # Close hemi loop
+done # Close parcellation loop
 
 #=============================================================================
 # Well done. You're all finished :)
