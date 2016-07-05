@@ -217,6 +217,10 @@ for parc in aparc 500.aparc lobesStrict; do
         # Now loop through all the quantitative measures
         for measure in R1 MT R2s A FA MD MO L1 L23; do
                 
+	    if [[ ! -f ${subjects[0]}/mri/${measure}/mgz ]]; then
+		echo "No ${measure} file - skipping"
+	        continue
+	    fi
             for frac in `seq -f %+02.2f 0 0.1 1`; do
             
                 for hemi in lh rh; do
