@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #====================================================================
-# Created by Kirstie Whitaker on 25th April 2016 
+# Created by Kirstie Whitaker on 25th April 2016
 #
 # DESCRIPTION:
 #    This code creates the 308 parcellation for each person in their
-#      freesurfer space, and should be applied after recon-all edits 
+#      freesurfer space, and should be applied after recon-all edits
 #      have been completed.
 #
 # INPUTS:
@@ -14,23 +14,23 @@
 #    sub_id    : Subject ID. These folders should be inside SUB_DATA
 #                  and themselves contain directories called SURFER
 #                  and MPM.
-#    occ       : The scan occasion. One of baseline, CBSU, UCL and 
-#                  WBIC. This directory contains the output of 
-#                  recon-all and is found inside the subject's SURFER
+#    occ       : The scan occasion. One of baseline, 6_month, 1st_follow_up,
+#                  CBSU, UCL, WBIC, t1 and t2. This directory contains the
+#                  output of recon-all and is found inside the subject's SURFER
 #                  directory.
 #
 # EXPECTS:
-#    All the output files from recon-all should exist in the 
-#      realavent occasion directory in the subject's SURFER 
+#    All the output files from recon-all should exist in the
+#      realavent occasion directory in the subject's SURFER
 #      directory.
 #    All quality control editing should have been conducted.
-#    The fsaverageSubP directory containing the standard space 
+#    The fsaverageSubP directory containing the standard space
 #      parcellation should exist inside the SUB_DATA directory.
 #
 # OUTPUTS:
 #    The following files are created inside the relavent occasion
 #      directory in the subject's SURFER directory
-# 
+#
 #        parcellation/500.aparc.nii.gz
 #        label/lh.500.aparc.annot
 #        label/rh.500.aparc.annot
@@ -49,7 +49,7 @@ function usage {
     echo "       <sub> is the subject ID that corresponds to a"
     echo "          folder in the SUB_DATA directory."
     echo "       <occ> is the scan occasion and is one of baseline,"
-    echo "         CBSU, WBIC and UCL"
+    echo "          6_month, 1st_follow_up, CBSU, WBIC, UCL, t1 and t2"
     echo ""
     echo "DESCRIPTION: This code creates the parcellation for each"
     echo "             person in their freesurfer space, and should"
@@ -80,7 +80,7 @@ if [[ -z ${occ} ]]; then
     echo "**** No occasion given ****"
     usage
 fi
-    
+
 #====================================================================
 # SET A COUPLE OF USEFUL VARIABLES
 #====================================================================
@@ -95,17 +95,17 @@ echo "==== Create 500 Parcellation ===="
 #====================================================================
 # Transform the fsaverage parcellations
 #====================================================================
-   
+
 SUBJECTS_DIR=${sub_data_dir}
 subjid=${occ}
-    
+
 # Loop through both hemispheres
 for hemi in lh rh; do
-    
+
     if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.500.aparc.annot ]]; then
-    
+
         echo "    Creating 500 parcellation (${hemi})"
-        # Transform the surface parcellation from fsaverage space 
+        # Transform the surface parcellation from fsaverage space
         # to indiviual native space
         mri_surf2surf --srcsubject ${fsaverage_subid} \
                         --sval-annot ${SUBJECTS_DIR}/${fsaverage_subid}/label/${hemi}.500.aparc \
