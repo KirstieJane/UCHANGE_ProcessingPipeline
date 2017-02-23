@@ -105,7 +105,7 @@ subjid=${occ}
 #        into 308 regions that are constrained to be within
 #        Deskian-Killiany atlas regions and no more than 500mm^2
 #        in surface area
-#    * Yeo2001_7Networks_N1000 is the Yeo parcellation with 7 networks
+#    * Yeo2011_7Networks_N1000 is the Yeo parcellation with 7 networks
 #        that ships with freesurfer (Yeo, 2011, J Neurophysiol)
 #    * HCP is the parcellation published by the Human Connectome
 #        Project (Glasser et al, 2016, Nature)
