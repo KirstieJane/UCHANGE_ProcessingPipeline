@@ -130,7 +130,7 @@ fi
 #     lobesStrict
 #=============================================================================
 
-for measure in R1 MT R2s A FA MD MO L1 L23; do
+for measure in MT R1 R2s A FA MD MO L1 L23; do
     if [[ -f ${surfer_dir}/mri/${measure}.mgz ]]; then
         
         echo -ne "  ${measure} segmentations:\t"
@@ -213,7 +213,7 @@ for parc in aparc 500.aparc lobesStrict; do
         echo " - done!"
 
         # Next loop through all the different MPM and DTI files
-        for measure in R1 MT R2s A FA MD MO L1 L23; do
+        for measure in MT R1 R2s A FA MD MO L1 L23; do
             if [[ ! -f ${surfer_dir}/mri/${measure}.mgz ]]; then
                 echo "      ${measure} does not exist, skipping"
                 continue
