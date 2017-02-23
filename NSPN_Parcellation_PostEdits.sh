@@ -100,7 +100,17 @@ SUBJECTS_DIR=${sub_data_dir}
 subjid=${occ}
 
 # Loop through the different parcellations
-for parcellation in 500.aparc Yeo2011_7Networks_N1000; do
+# Specifically:
+#    * 500.aparc is the NSPN500 parcellation which splits the brain
+#        into 308 regions that are constrained to be within
+#        Deskian-Killiany atlas regions and no more than 500mm^2
+#        in surface area
+#    * Yeo2001_7Networks_N1000 is the Yeo parcellation with 7 networks
+#        that ships with freesurfer (Yeo, 2011, J Neurophysiol)
+#    * HCP is the parcellation published by the Human Connectome
+#        Project (Glasser et al, 2016, Nature)
+
+for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP; do
 
     # Create the surface parcellations in subject space
     echo "    Transforming ${parcellation} parcellation"
