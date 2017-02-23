@@ -90,7 +90,7 @@ fsaverage_subid=fsaverageSubP
 #====================================================================
 # PRINT TO SCREEN WHAT WE'RE DOING
 #====================================================================
-echo "==== Create 500 Parcellation ===="
+echo "==== Create individual parcellations ===="
 
 #====================================================================
 # Transform the fsaverage parcellations
@@ -99,39 +99,48 @@ echo "==== Create 500 Parcellation ===="
 SUBJECTS_DIR=${sub_data_dir}
 subjid=${occ}
 
-# Loop through both hemispheres
-for hemi in lh rh; do
+# Loop through the different parcellations
+for parcellation in 500.aparc Yeo2011_7Networks_N1000; do
 
-    if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.500.aparc.annot ]]; then
+    # Create the surface parcellations in subject space
+    echo "    Transforming ${parcellation} parcellation"
 
-        echo "    Creating 500 parcellation (${hemi})"
-        # Transform the surface parcellation from fsaverage space
-        # to indiviual native space
-        mri_surf2surf --srcsubject ${fsaverage_subid} \
-                        --sval-annot ${SUBJECTS_DIR}/${fsaverage_subid}/label/${hemi}.500.aparc \
-                        --trgsubject ${sub}/SURFER/${subjid} \
-                        --trgsurfval ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.500.aparc \
-                        --hemi ${hemi}
+    # Loop through both hemispheres
+    for hemi in lh rh; do
+
+        # Check to see if output file already exists
+        if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.${parcellation}.annot ]]; then
+
+            echo "        Creating ${hemi} ${parcellation} surface in subject space"
+            # Transform the surface parcellation from fsaverage space
+            # to indiviual native space
+            mri_surf2surf --srcsubject ${fsaverage_subid} \
+                            --sval-annot ${SUBJECTS_DIR}/${fsaverage_subid}/label/${hemi}.${parcellation} \
+                            --trgsubject ${sub}/SURFER/${subjid} \
+                            --trgsurfval ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.${parcellation} \
+                            --hemi ${hemi}
+        else
+            echo "        ${hemi} ${parcellation} surface already in subject space"
+        fi
+    done
+
+    # Check to see if volume parcellation file already exists
+    if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz ]]; then
+
+        # Transform indivual surface parcellation to individual volume parcellation
+        echo "        Creating ${parcellation} volume in subject space"
+        mkdir -p ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/
+        mri_aparc2aseg --s ${sub}/SURFER/${subjid} \
+                        --o ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz \
+                        --annot ${parcellation} \
+                        --rip-unknown \
+                        --hypo-as-wm
     else
-        echo "    ${hemi} 500 parcellation already created"
+        echo "        ${parcellation} volume in subject space already in subject space"
+
     fi
+
 done
-
-if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/500.aparc.nii.gz ]]; then
-
-    # Transform indivual surface parcellation to individual volume parcellation
-    echo "    Creating 500 parcellation volume"
-    mkdir -p ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/
-    mri_aparc2aseg --s ${sub}/SURFER/${subjid} \
-                    --o ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/500.aparc.nii.gz \
-                    --annot 500.aparc \
-                    --rip-unknown \
-                    --hypo-as-wm
-else
-    echo "    500 parcellation volume already created"
-
-fi
-
 #====================================================================
 # All done!
 #====================================================================
