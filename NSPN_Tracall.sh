@@ -117,12 +117,12 @@ cp ${template_dmrirc_file} ${SUBJECTS_DIR}/dmrirc_${occ}
 sed -i "s|%%%%SUBJECTS_DIR%%%%|${SUBJECTS_DIR}|g" \
             ${SUBJECTS_DIR}/dmrirc_${occ}
 
-# Replace the OCC (location) references with this specific subjects' directory
-sed -i "s|%%%%LOC%%%%|${occ}|g" \
+# Replace the OCC references with this specific subjects' directory
+sed -i "s|%%%%OCC%%%%|${occ}|g" \
             ${SUBJECTS_DIR}/dmrirc_${occ}
 
 # Replace the DTI_DIR references with this specific DTI directory
-sed -i "s|%%%%DTI_DIR%%%%|${DTI_DIR}|g" \
+sed -i "s|%%%%DTI_DIR%%%%|${dti_dir}|g" \
             ${SUBJECTS_DIR}/dmrirc_${occ}
 
 
