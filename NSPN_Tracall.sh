@@ -33,7 +33,7 @@
 #====================================================================
 function usage {
 
-    echo "USAGE: NSPN_Tracall_MPM.sh <data_dir> <sub> <occ>"
+    echo "USAGE: NSPN_Tracall.sh <data_dir> <sub> <occ>"
     echo "       <data_dir> is the parent directory to the SUB_DATA"
     echo "         directory and expects to find SUB_DATA inside it"
     echo "         and then the standard NSPN directory structure."
@@ -92,7 +92,7 @@ if [[ ! -f ${dti_dir}/bvecs_orig ]]; then
     exit
 fi
 
-template_dmrirc_file=`dirname ${0}`/TEMPLATE_dmrirc
+template_dmrirc_file=`dirname ${0}`/NSPN_dmrirc_TEMPLATE
 if [[ ! -f ${template_dmrirc_file} ]]; then
     echo "template dmrirc file doesn't exist - CHECK ${template_dmrirc_file}"
     exit
