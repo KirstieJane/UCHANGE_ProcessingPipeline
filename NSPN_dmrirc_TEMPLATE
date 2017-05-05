@@ -1,6 +1,9 @@
 # NSPN template dmrirc file based on:
 # dmrirc.example
 #
+# Updated on 5th May 2017
+# by Kirstie Whitaker
+#
 # This file contains commands that will be run by trac-all before an analysis.
 # It is used to set all parameters needed for the analysis.
 #
@@ -45,7 +48,7 @@ setenv SUBJECTS_DIR ####DATA_DIR####/SUB_DATA/####SUBID####/SURFER/
 # Subject IDs
 #
 # ===== SET SUBID ======
-set subjlist = (MRI0)
+set subjlist = (####OCC####)
 
 #-----------------------------------------------------------------------------
 # In case you want to analyze only Huey and Louie
@@ -59,7 +62,7 @@ set subjlist = (MRI0)
 # but then the gradient table and b-value table must be specified (see below)
 #
 # ===== SET DTI FILE ======
-set dcmroot = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/MRI0/
+set dcmroot = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/
 set dcmlist = (dti.nii.gz)
 
 #-----------------------------------------------------------------------------
@@ -84,7 +87,7 @@ set dcmlist = (dti.nii.gz)
 # Default: Read from DICOM header
 #
 # ===== SET BVECS FILE ======
-set bvecfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/MRI0/bvecs_orig
+set bvecfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/bvecs_orig
 
 #-----------------------------------------------------------------------------
 # Diffusion b-value table
@@ -93,7 +96,7 @@ set bvecfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/MRI0/bvecs_orig
 # Default: Read from DICOM header
 #
 # ===== SET BVALS FILE ======
-set bvalfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/MRI0/bvals
+set bvalfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/bvals
 
 #-----------------------------------------------------------------------------
 # Perform registration-based B0-inhomogeneity compensation?
