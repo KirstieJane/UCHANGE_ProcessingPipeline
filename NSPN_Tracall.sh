@@ -111,19 +111,19 @@ surf_sub=${occ}
 # SET UP THE dmrirc FILE
 #====================================================================
 # Copy the dmrirc.TEMPLATE file into SUBJECTS_DIR
-cp ${template_dmrirc_file} ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ}
+cp ${template_dmrirc_file} ${SUBJECTS_DIR}/dmrirc_${occ}
 
 # Replace the SUBJECTS_DIR references with this specific subjects' directory
 sed -i "s|%%%%SUBJECTS_DIR%%%%|${SUBJECTS_DIR}|g" \
-            ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ}
+            ${SUBJECTS_DIR}/dmrirc_${occ}
 
 # Replace the OCC (location) references with this specific subjects' directory
 sed -i "s|%%%%LOC%%%%|${occ}|g" \
-            ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ}
+            ${SUBJECTS_DIR}/dmrirc_${occ}
 
 # Replace the DTI_DIR references with this specific DTI directory
 sed -i "s|%%%%DTI_DIR%%%%|${DTI_DIR}|g" \
-            ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ}
+            ${SUBJECTS_DIR}/dmrirc_${occ}
 
 
 #====================================================================
@@ -139,18 +139,18 @@ echo "==== Running Trac-all ===="
 if [[ -f ${SUBJECTS_DIR}/${occ}/scripts/recon-all.done ]]; then
 
     if [[ ! -f ${SUBJECTS_DIR}/${occ}/scripts/trac-preproc.done ]]; then
-        trac-all -prep -c ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ} -no-isrunning
+        trac-all -prep -c ${SUBJECTS_DIR}/dmrirc_${occ} -no-isrunning
     fi
 
     if [[ ! -f ${SUBJECTS_DIR}/${occ}/dmri.bedpostX/mean_fsumsamples.nii.gz ]]; then
-        trac-all -bedp -c ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ} -no-isrunning 
+        trac-all -bedp -c ${SUBJECTS_DIR}/dmrirc_${occ} -no-isrunning 
     fi
 
     if [[ ! -f ${SUBJECTS_DIR}/${occ}/scripts/trac-paths.done ]]; then
-        trac-all -path -c ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ} -no-isrunning
+        trac-all -path -c ${SUBJECTS_DIR}/dmrirc_${occ} -no-isrunning
     fi
 
-    trac-all -stat -c ${SUBJECTS_DIR}/TravellingHeads_dmrirc_${occ} -no-isrunning
+    trac-all -stat -c ${SUBJECTS_DIR}/dmrirc_${occ} -no-isrunning
 fi
 
 #====================================================================
