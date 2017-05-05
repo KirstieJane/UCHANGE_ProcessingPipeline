@@ -36,7 +36,7 @@
 # T1 images and FreeSurfer segmentations are expected to be found here
 # 
 # ===== SET SUBJECT DIR ======
-setenv SUBJECTS_DIR ####DATA_DIR####/SUB_DATA/####SUBID####/SURFER/
+setenv SUBJECTS_DIR %%%%DATA_DIR%%%%/SUB_DATA/%%%%SUBID%%%%/SURFER/
 
 #-----------------------------------------------------------------------------
 # Output directory where trac-all results will be saved
@@ -48,7 +48,7 @@ setenv SUBJECTS_DIR ####DATA_DIR####/SUB_DATA/####SUBID####/SURFER/
 # Subject IDs
 #
 # ===== SET SUBID ======
-set subjlist = (####OCC####)
+set subjlist = (%%%%OCC%%%%)
 
 #-----------------------------------------------------------------------------
 # In case you want to analyze only Huey and Louie
@@ -62,7 +62,7 @@ set subjlist = (####OCC####)
 # but then the gradient table and b-value table must be specified (see below)
 #
 # ===== SET DTI FILE ======
-set dcmroot = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/
+set dcmroot = %%%%DATA_DIR%%%%/SUB_DATA/%%%%SUBID%%%%/DTI/%%%%OCC%%%%/
 set dcmlist = (dti.nii.gz)
 
 #-----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ set dcmlist = (dti.nii.gz)
 # Default: Read from DICOM header
 #
 # ===== SET BVECS FILE ======
-set bvecfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/bvecs_orig
+set bvecfile = %%%%DATA_DIR%%%%/SUB_DATA/%%%%SUBID%%%%/DTI/%%%%OCC%%%%/bvecs_orig
 
 #-----------------------------------------------------------------------------
 # Diffusion b-value table
@@ -96,7 +96,7 @@ set bvecfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/bvecs_ori
 # Default: Read from DICOM header
 #
 # ===== SET BVALS FILE ======
-set bvalfile = ####DATA_DIR####/SUB_DATA/####SUBID####/DTI/####OCC####/bvals
+set bvalfile = %%%%DATA_DIR%%%%/SUB_DATA/%%%%SUBID%%%%/DTI/%%%%OCC%%%%/bvals
 
 #-----------------------------------------------------------------------------
 # Perform registration-based B0-inhomogeneity compensation?
