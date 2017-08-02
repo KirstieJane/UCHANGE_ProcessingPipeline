@@ -1,13 +1,13 @@
 #!/bin/bash
 
 #====================================================================
-# Created by Kirstie Whitaker on 25th April 2016 
+# Created by Kirstie Whitaker on 25th April 2016
 #
 # DESCRIPTION:
-#    This code takes a freesurfer directory and runs the appropriate 
+#    This code takes a freesurfer directory and runs the appropriate
 #      commands to parcellate the volume into the six lobes defined
 #      by freesurfer using the --lobesStrict flag.
-#    For more information see: 
+#    For more information see:
 #      https://surfer.nmr.mgh.harvard.edu/fswiki/CorticalParcellation
 #
 # INPUTS:
@@ -16,8 +16,8 @@
 #    sub_id    : Subject ID. These folders should be inside SUB_DATA
 #                  and themselves contain directories called SURFER
 #                  and MPM.
-#    occ       : The scan occasion. One of baseline, CBSU, UCL and 
-#                  WBIC. This directory contains the output of 
+#    occ       : The scan occasion. One of baseline, CBSU, UCL and
+#                  WBIC. This directory contains the output of
 #                  recon-all and is found inside the subject's SURFER
 #                  directory.
 #
@@ -27,7 +27,7 @@
 # OUTPUTS:
 #    The following files are created inside the relavent occasion
 #      directory in the subject's SURFER directory
-# 
+#
 #        mri/lobes+aseg.mgz
 #        label/lh.lobesStrict.annot
 #        label/rh.lobesStrict.annot
@@ -55,7 +55,7 @@ function usage {
     echo "             The code should be applied after recon-all"
     echo "             edits have been completed"
     exit
-} 
+}
 
 #====================================================================
 # READ IN COMMAND LINE ARGUMENTS
@@ -78,7 +78,7 @@ if [[ -z ${occ} ]]; then
     echo "**** No occasion given ****"
     usage
 fi
-    
+
 #====================================================================
 # CHECK THE INPUTS
 #====================================================================
@@ -109,13 +109,13 @@ echo "==== Assign Lobes ===="
 for hemi in lh rh; do
     if [[ ! -f ${surfer_dir}/label/${hemi}.lobesStrict.annot ]]; then
 
-        echo "    Assigning lobe labels (${hemi})"
+        echo "  Assigning lobe labels (${hemi})"
         mri_annotation2label --subject ${surf_sub} \
                              --hemi ${hemi} \
                              --lobesStrict \
                              ${surfer_dir}/label/${hemi}.lobesStrict
     else
-        echo "    ${hemi} lobe labels already assigned"
+        echo "  ${hemi} lobe labels already assigned"
     fi
 done
 
@@ -126,7 +126,7 @@ done
 # and label the white matter up to 5mm beneath the lobes
 if [[ ! -f ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
 
-    echo "    Assigning white matter 5mm below cortical surface to lobe labes"
+    echo "  Assigning white matter 5mm below cortical surface to lobe labes"
 
     mri_aparc2aseg --s ${surf_sub} \
                 --labelwm \
@@ -134,7 +134,7 @@ if [[ ! -f ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
                 --annot lobesStrict \
                 --o ${surfer_dir}/mri/lobes+aseg.mgz
 else
-    echo "    White matter 5mm below cortical surface already assigned to lobe"
+    echo "  White matter 5mm below cortical surface already assigned to lobe"
 fi
 
 #====================================================================
