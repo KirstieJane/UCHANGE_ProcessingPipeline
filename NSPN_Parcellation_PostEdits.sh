@@ -29,7 +29,7 @@
 #
 # OUTPUTS:
 #    The following files are created inside the relavent occasion
-#      directory in the subject's SURFER directory
+#      directory in the subject's SURFER directory:
 #
 #        parcellation/500.aparc.nii.gz
 #        label/lh.500.aparc.annot
@@ -51,10 +51,10 @@ function usage {
     echo "       <occ> is the scan occasion and is one of baseline,"
     echo "          6_month, 1st_follow_up, CBSU, WBIC, UCL, t1 and t2"
     echo ""
-    echo "DESCRIPTION: This code creates the parcellation for each"
-    echo "             person in their freesurfer space, and should"
-    echo "             be applied after recon-all edits have been"
-    echo "             completed"
+    echo "DESCRIPTION: This code creates a few different parcellations"
+    echo "             for each person in their freesurfer space, and"
+    echo "             should be applied after recon-all edits have"
+    echo "             been completed"
     exit
 }
 
@@ -109,8 +109,11 @@ subjid=${occ}
 #        that ships with freesurfer (Yeo, 2011, J Neurophysiol)
 #    * HCP is the parcellation published by the Human Connectome
 #        Project (Glasser et al, 2016, Nature)
+#    * economo is the Von Economo parcellation published by the
+#        Dutch Connectome Lab (lead by Martijn van den Heuvel)
+#        and available at http://www.dutchconnectomelab.nl/economo/
 
-for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP; do
+for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP economo; do
 
     # Create the surface parcellations in subject space
     echo "    Transforming ${parcellation} parcellation"
