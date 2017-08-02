@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #====================================================================
-# Created by Kirstie Whitaker on 25th April 2016 
+# Created by Kirstie Whitaker on 25th April 2016
 #
 # DESCRIPTION:
 #    This code takes a freesurfer directory and calculates 9 surfaces
-#      between the white and pial surfaces at fractional depths of 
+#      between the white and pial surfaces at fractional depths of
 #      10% thickness, and also calculates 19 steps of 0.1mm depth
 #      from the grey/white matter boundary into white matter
 #
@@ -15,13 +15,13 @@
 #    sub_id    : Subject ID. These folders should be inside SUB_DATA
 #                  and themselves contain directories called SURFER
 #                  and MPM.
-#    occ       : The scan occasion. One of baseline, CBSU, UCL and 
-#                  WBIC. This directory contains the output of 
+#    occ       : The scan occasion. One of baseline, CBSU, UCL and
+#                  WBIC. This directory contains the output of
 #                  recon-all and is found inside the subject's SURFER
 #                  directory.
 #
 # EXPECTS:
-#    Recon-all, trac-all and quality control edits must have been   
+#    Recon-all, trac-all and quality control edits must have been
 #      completed.
 #
 # OUTPUTS:
@@ -67,7 +67,7 @@ if [[ -z ${occ} ]]; then
     print_usage=1
 fi
 
-if [[ ${print_usage} == 1 ]]; then 
+if [[ ${print_usage} == 1 ]]; then
     usage
 fi
 
@@ -92,24 +92,24 @@ if [[ ! -f ${surfer_dir}/mri/T1.mgz ]]; then
     echo "No T1.mgz file in surfer directory. Exiting"
     exit
 fi
-    
+
 #=============================================================================
 # RESAMPLE THE SURFACES
 #=============================================================================
 
 # Loop over both left and right hemispheres
 for hemi in lh rh; do
-    echo -n " Hemi: ${hemi}"
+    echo " Hemi: ${hemi}"
 
-    # Loop through a bunch of different fractional depths 
+    # Loop through a bunch of different fractional depths
     # from the white matter surface
-    
+
     for frac in `seq -f %+02.2f 0.0 0.1 1.0`; do
-        echo -n " frac: ${frac}"
+        echo -n "  frac: ${frac}"
 
         # You don't have to create a surface for the white matter and
-        # pial surfaces which are the "special cases" of frac == 0.0 and 
-        # 1.0 respectively 
+        # pial surfaces which are the "special cases" of frac == 0.0 and
+        # 1.0 respectively
         if [[ ${frac} == +1.00 ]]; then
             cp ${surfer_dir}/surf/${hemi}.pial \
                 ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded
@@ -118,7 +118,7 @@ for hemi in lh rh; do
                 ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded
         fi
 
-        # Create the interim surface by expanding the white matter surface by 
+        # Create the interim surface by expanding the white matter surface by
         # the given fraction of thickness
         echo -n " expanding surface"
         if [[ ! -f ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded ]]; then
@@ -127,15 +127,16 @@ for hemi in lh rh; do
                             ${frac} \
                             ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded
         fi
-        echo -n " - done!"
-    
+        echo " - done!"
+
     done # Close the fraction of cortical thickness loop
-            
+
     # Now loop through the different absolute depths
     # from the grey/white matter boundary
     for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
+        echo -n "  dist: ${dist}"
 
-        # Create the interim surface by expanding the white matter surface by 
+        # Create the interim surface by expanding the white matter surface by
         # the given fraction of thickness
         echo -n " expanding surface into white matter"
         if [[ ! -f ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded ]]; then
@@ -143,10 +144,10 @@ for hemi in lh rh; do
                             ${dist} \
                             ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded
         fi
-        echo -n " - done!"
+        echo " - done!"
 
     done # Close the absolute distance from grey/white matter boundary loop
-    echo -ne "\n" # Close the text string
+    #echo -ne "\n" # Close the text string
 done # Close hemi loop
 
 #=============================================================================
