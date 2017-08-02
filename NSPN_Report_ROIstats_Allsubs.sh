@@ -108,7 +108,7 @@ done
 
 subjects=(`ls -d ${data_dir}/SUB_DATA/*/SURFER/*/ 2> /dev/null`)
 
-for parc in aparc 500.aparc lobesStrict HCP Yeo2011_7Networks_N1000; do
+for parc in aparc 500.aparc lobesStrict HCP Yeo2011_7Networks_N1000 economo; do
 
     # Start by pulling out the standard measures
     for measure in area volume thickness thicknessstd meancurv gauscurv foldind curvind; do
