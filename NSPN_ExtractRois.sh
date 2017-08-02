@@ -254,7 +254,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
                                         ${surf_sub} \
                                         ${hemi}
             else
-                echo -n " - done!"
+                echo " - done!"
             fi
 
             # Loop through a bunch of different fractional depths
