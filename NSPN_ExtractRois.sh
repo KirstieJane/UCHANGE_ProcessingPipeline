@@ -198,6 +198,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
         echo -n "      Extracting stats"
         if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.stats \
                 && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+            echo ""
             mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                     -f ${surfer_dir}/stats/${hemi}.${parc}.stats \
                                     ${surf_sub} \
@@ -207,6 +208,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
         # Also extract sulcal depth
         if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
                 && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+            echo ""
             mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                     -f ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
                                     -t sulc \
@@ -218,15 +220,17 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
         # Next loop through all the different MPM and DTI files
         for measure in MT R1 R2s A FA MD MO L1 L23; do
             if [[ ! -f ${surfer_dir}/mri/${measure}.mgz ]]; then
-                echo "      ${measure} does not exist, skipping"
+                echo "    ${measure} does not exist, skipping"
                 continue
             fi
 
-            echo "    ${measure} parcellations "
+            echo "    ${measure} parcellations"
 
             # Take the average across all of cortex
+            echo -n "      Average across cortex"
             if [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_cortexAv.mgh ]]; then
 
+                echo ""
                 mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
                                 --o ${surfer_dir}/surf/${hemi}.${measure}_cortexAv.mgh \
                                 --regheader ${surf_sub} \
@@ -234,17 +238,23 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
                                 --interp nearest \
                                 --surf white \
                                 --hemi ${hemi}
+            else
+                echo -n " - done!"
             fi
 
             # Calculate the stats
+            echo -n " Extracting stats"
             if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats \
                         && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
 
+                echo ""
                 mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                         -t ${surfer_dir}/surf/${hemi}.${measure}_cortexAv.mgh \
                                         -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats \
                                         ${surf_sub} \
                                         ${hemi}
+            else
+                echo -n " - done!"
             fi
 
             # Loop through a bunch of different fractional depths
@@ -259,6 +269,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
                     continue
                 elif [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_frac${frac}_expanded.mgh ]]; then
 
+                    echo ""
                     mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
                                     --o ${surfer_dir}/surf/${hemi}.${measure}_frac${frac}_expanded.mgh \
                                     --regheader ${surf_sub} \
@@ -273,6 +284,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
                 if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats \
                             && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
 
+                    echo ""
                     mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                             -t ${surfer_dir}/surf/${hemi}.${measure}_frac${frac}_expanded.mgh \
                                             -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats \
@@ -291,10 +303,11 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
                 # Project the values to the surface
                 echo -n " Projecting values to surface"
                 if [[ ! -f ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded ]]; then
-                    echo " -- Surface not resampled. Skipping this depth."
+                    echo -n " -- Surface not resampled. Skipping this depth."
                     continue
                 elif [[ ! -f ${surfer_dir}/surf/${hemi}.${measure}_dist${dist}_expanded.mgh ]]; then
 
+                    echo ""
                     mri_vol2surf --mov ${surfer_dir}/mri/${measure}.mgz \
                                     --o ${surfer_dir}/surf/${hemi}.${measure}_dist${dist}_expanded.mgh \
                                     --regheader ${surf_sub} \
@@ -309,6 +322,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
                 if [[ ! -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats \
                             && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
 
+                    echo ""
                     mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                             -t ${surfer_dir}/surf/${hemi}.${measure}_dist${dist}_expanded.mgh \
                                             -f ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats \
