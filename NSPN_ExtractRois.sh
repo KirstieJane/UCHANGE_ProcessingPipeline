@@ -182,10 +182,11 @@ done
 #     lobesStrict
 #     Yeo2011_7Networks_N1000
 #     HCP
+#     economo
 #=============================================================================
 
 # Loop over parcellations
-for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP; do
+for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
     echo "==== Parc: ${parc} ===="
 
     # Loop over both left and right hemispheres
