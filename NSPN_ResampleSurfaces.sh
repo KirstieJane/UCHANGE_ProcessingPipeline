@@ -99,13 +99,13 @@ fi
 
 # Loop over both left and right hemispheres
 for hemi in lh rh; do
-    echo " Hemi: ${hemi}"
+    echo "  -- Hemi: ${hemi} --"
 
     # Loop through a bunch of different fractional depths
     # from the white matter surface
 
     for frac in `seq -f %+02.2f 0.0 0.1 1.0`; do
-        echo -n "  frac: ${frac}"
+        echo -n "    Frac: ${frac}"
 
         # You don't have to create a surface for the white matter and
         # pial surfaces which are the "special cases" of frac == 0.0 and
@@ -122,6 +122,8 @@ for hemi in lh rh; do
         # the given fraction of thickness
         echo -n " expanding surface"
         if [[ ! -f ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded ]]; then
+
+            echo ""
             mris_expand -thickness \
                             ${surfer_dir}/surf/${hemi}.white \
                             ${frac} \
@@ -134,12 +136,14 @@ for hemi in lh rh; do
     # Now loop through the different absolute depths
     # from the grey/white matter boundary
     for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
-        echo -n "  dist: ${dist}"
+        echo -n "    Dist: ${dist}"
 
         # Create the interim surface by expanding the white matter surface by
         # the given fraction of thickness
         echo -n " expanding surface into white matter"
         if [[ ! -f ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded ]]; then
+
+            echo ""
             mris_expand ${surfer_dir}/surf/${hemi}.white \
                             ${dist} \
                             ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded
