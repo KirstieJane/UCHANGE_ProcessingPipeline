@@ -337,7 +337,7 @@ for parc in aparc 500.aparc lobesStrict HCP Yeo2011_7Networks_N1000 economo; do
             done # Close the hemi loop
 
             sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/SURFER/MRI|,|g" ${data_dir}/FS_ROIS/nspn_id_col
+            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col
             sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col
             sed -i "s|${hemi}.${parc}.${measure}_cortexAv.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col
 
