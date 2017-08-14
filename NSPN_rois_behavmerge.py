@@ -42,7 +42,7 @@ if len(sys.argv) < 2:
 
 # Get the fs_rois_dir from the command line
 if not sys.argv[1]:
-    print "Can't find FS_ROIS directory"
+    print ("Can't find FS_ROIS directory")
     usage()
 else:
     fs_rois_dir=sys.argv[1]
