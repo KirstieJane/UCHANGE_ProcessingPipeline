@@ -104,7 +104,7 @@ for f in file_list:
             df = df_behav.merge(df_meas, on=['nspn_id', 'occ'])
 
             # Sort into ascending nspn_id
-            df.sort('nspn_id', inplace=True)
+            df.sort_values(by='nspn_id', inplace=True)
 
             # Drop columns containing the word 'Measure'
             # if they exist
