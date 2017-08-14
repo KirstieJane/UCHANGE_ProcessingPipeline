@@ -29,7 +29,7 @@ import sys
 #=============================================================================
 
 def usage():
-    print "USAGE freesurfer_rois_behavmerge.py <FS_ROIS_DIR> <BEHAV_FILE>"
+    print ("USAGE freesurfer_rois_behavmerge.py <FS_ROIS_DIR> <BEHAV_FILE>")
     sys.exit()
 
 #=============================================================================
@@ -37,7 +37,7 @@ def usage():
 #=============================================================================
 # Check that two arguments have been passed
 if len(sys.argv) < 2:
-    print "Not enough arguments passed"
+    print ("Not enough arguments passed")
     usage()
 
 # Get the fs_rois_dir from the command line
@@ -51,10 +51,10 @@ else:
 if sys.argv[2]:
     behav_file=sys.argv[2]
     if not os.path.isfile(behav_file):
-        print "Can't find behav_file"
+        print ("Can't find behav_file")
         usage()
 else:
-     print "Can't find behav_file"
+     print ("Can't find behav_file")
      usage()
 
 #=============================================================================
@@ -63,7 +63,7 @@ else:
 df_behav = pd.read_csv(behav_file)
 
 suffix = os.path.basename(behav_file).strip('.csv')
-print suffix
+print (suffix)
 
 #=============================================================================
 # MERGE MEASURES WITH BEHAV VALUES
@@ -87,7 +87,7 @@ for measure in measure_list:
 
 # Loop through the files
 for f in file_list:
-    print f
+    print (f)
     # Check the number of lines that are in the file
     with open(f) as fid:
         num_lines = len(fid.readlines())
