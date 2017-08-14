@@ -65,7 +65,7 @@ df_behav = pd.read_csv(behav_file)
 # Drop rows in df_behav where nspn_id is missing
 df_behav.dropna(subset=['nspn_id'], inplace=True)
 
-suffix = os.path.basename(behav_file).strip('.csv')
+suffix = os.path.basename(behav_file).split('.csv')[0]
 print (suffix)
 
 #=============================================================================
@@ -120,7 +120,7 @@ for f in file_list:
             f_name = os.path.basename(f)
             f_out = f_name.replace('.', '')
             # and appends the name of the behavioural file
-            f_out = f_out.split('.csv')[0] + '_{}.csv'.format(suffix)
+            f_out = f_out.rsplit('csv', 1)[0] + '_{}.csv'.format(suffix)
 
             # Put this file in the same folder as the behavioural file
             behav_dir = os.path.dirname(behav_file)
