@@ -1,0 +1,128 @@
+roi_value	roi_name
+2	Left-Cerebral-White-Matter
+4	Left-Lateral-Ventricle
+5	Left-Inf-Lat-Vent
+7	Left-Cerebellum-White-Matter
+8	Left-Cerebellum-Cortex
+10	Left-Thalamus-Proper
+11	Left-Caudate
+12	Left-Putamen
+13	Left-Pallidum
+14	3rd-Ventricle
+15	4th-Ventricle
+16	Brain-Stem
+17	Left-Hippocampus
+18	Left-Amygdala
+24	CSF
+26	Left-Accumbens-area
+28	Left-VentralDC
+30	Left-vessel
+31	Left-choroid-plexus
+41	Right-Cerebral-White-Matter
+43	Right-Lateral-Ventricle
+44	Right-Inf-Lat-Vent
+46	Right-Cerebellum-White-Matter
+47	Right-Cerebellum-Cortex
+49	Right-Thalamus-Proper
+50	Right-Caudate
+51	Right-Putamen
+52	Right-Pallidum
+53	Right-Hippocampus
+54	Right-Amygdala
+58	Right-Accumbens-area
+60	Right-VentralDC
+62	Right-vessel
+63	Right-choroid-plexus
+77	WM-hypointensities
+85	Optic-Chiasm
+251	CC_Posterior
+252	CC_Mid_Posterior
+253	CC_Central
+254	CC_Mid_Anterior
+255	CC_Anterior
+1002	FA L
+1003	FB L
+1004	FC L
+1005	FCBm L
+1006	FD L
+1007	FDdelta L
+1008	FDT L
+1009	FE L
+1010	FF L
+1011	FG L
+1012	FH L
+1013	FJK L
+1014	FLMN L
+1015	HA L
+1016	HB L
+1017	HC L
+1018	IA L
+1019	IB L
+1020	LA1 L
+1021	LA2 L
+1022	LC1 L
+1023	LC2 L
+1024	LC3 L
+1025	LD L
+1026	LE L
+1027	OA L
+1028	OB L
+1029	OC L
+1030	PA L
+1031	PB L
+1032	PC L
+1033	PD L
+1034	PE L
+1035	PF L
+1036	PG L
+1037	PH L
+1038	TA L
+1039	TB L
+1040	TC L
+1041	TD L
+1042	TE L
+1043	TF L
+1044	TG L
+2002	FA R
+2003	FB R
+2004	FC R
+2005	FCBm R
+2006	FD R
+2007	FDdelta R
+2008	FDT R
+2009	FE R
+2010	FF R
+2011	FG R
+2012	FH R
+2013	FJK R
+2014	FLMN R
+2015	HA R
+2016	HB R
+2017	HC R
+2018	IA R
+2019	IB R
+2020	LA1 R
+2021	LA2 R
+2022	LC1 R
+2023	LC2 R
+2024	LC3 R
+2025	LD R
+2026	LE R
+2027	OA R
+2028	OB R
+2029	OC R
+2030	PA R
+2031	PB R
+2032	PC R
+2033	PD R
+2034	PE R
+2035	PF R
+2036	PG R
+2037	PH R
+2038	TA R
+2039	TB R
+2040	TC R
+2041	TD R
+2042	TE R
+2043	TF R
+2044	TG R
