@@ -153,6 +153,20 @@ for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP economo; do
 
     fi
 
+    # Check to see if renumbered volume parcellation file already exists
+    if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}_renum.nii.gz ]]; then
+
+        # Transform indivual surface parcellation to individual volume parcellation
+        echo "        Renumbering ${parcellation} volume to consecutive counters"
+        scripts_dir=$0
+        ${scripts_dir}/NSPN_RenumberParcellationVolume.py \
+            ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz \
+            ${scripts_dir}/FS_SUBJECTS/fsaverageSubP/parcellation/${parcellation}.regionIDs.txt
+    else
+        echo "        ${parcellation} volume in subject space already renumbered"
+
+    fi
+
 done
 #====================================================================
 # All done!
