@@ -158,9 +158,8 @@ for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP economo; do
 
         # Transform indivual surface parcellation to individual volume parcellation
         echo "        Renumbering ${parcellation} volume to consecutive counters"
-        scripts_dir=$0
+        scripts_dir=`dirname $0`
 
-        echo ${scripts_dir}
         ${scripts_dir}/NSPN_RenumberParcellationVolume.py \
             ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz \
             ${scripts_dir}/FS_SUBJECTS/fsaverageSubP/parcellation/${parcellation}.regionIDs.txt

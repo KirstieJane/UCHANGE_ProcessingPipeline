@@ -62,19 +62,60 @@ if not os.path.isfile(aparc_regionIDs_file):
 img = nib.load(parcellation_file)
 data = img.get_data()
 
-# Read in the regionIDs to a dictionary
-# where the
+# Read in the regionIDs to a dictionary where the key is
+# the value in the fsaverageSubP parcellation volume
+# and the value is the counter value of the region.
+# In other words, this dictionary contains the mapping of
+# the original parcellation values, to the renumbered
+# parcellation values.
 regionIDs_dict = {}
 with open(aparc_regionIDs_file) as f:
     lines = f.readlines()[1:]
-    for line in lines:
-       (key, val) = line.split()
-       regionIDs[int(key)] = val
-
-print(regionIDS_dict)
+    for i, line in enumerate(lines):
+       (value, name) = line.split()
+       regionIDs_dict[int(value)] = i+1
 
 #=============================================================================
-# SEGMENTATIONS
+# SET ADDITIONAL REGIONS TO ZERO
 #=============================================================================
-# Loop through the various segmentations
-for seg in aseg wmparc lobesStrict; do
+# If there are any values in the parcellation volume file
+# that do not map to any of the values in the regionIDs dictionary
+# then set these values to zero.
+
+# This command checks to see if there are any values in the
+# parcellation volume (data) that are not in the regionIDs keys.
+# If the sum is zero then all values in data are included in
+# the regionIDs_dict set of keys. If the sum is greater
+# than zero then there are some values that are not in the
+# dictionary.
+mask = np.in1d(data, regionIDs_dict.keys(), invert=False)
+
+n_additional = np.sum(mask)
+
+if n_additional > 0:
+    print('Oh no! There are some extra labels!')
+    print('  Setting these additional regions to zero')
+    data[mask.reshape(data)] = 0
+
+#=============================================================================
+# MAP REGIONAL VALUES
+#=============================================================================
+# Here's the real magic: map all the values from the original ones
+# to the new values as defined in regionIDs_dict.
+
+new_data = np.copy(data)
+
+print('Re-numbering data, this may take a while')
+for orig, new in regionIDs_dict.items():
+    new_data[data==orig] = new
+
+#=============================================================================
+# WRITE OUT THE RENUMBERED FILE
+#=============================================================================
+# As it says above, write out the file
+new_img = nib.Nifti1Image(new_data, img.affine)
+new_img.to_filename(parcellation_file.replace('.nii', '_renum.nii'))
+
+#=============================================================================
+# Done! Congratulations :)
+#=============================================================================

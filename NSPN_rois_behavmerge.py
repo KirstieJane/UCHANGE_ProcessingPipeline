@@ -62,6 +62,21 @@ else:
 #=============================================================================
 df_behav = pd.read_csv(behav_file)
 
+# Create the nspn_id column if it doesn't yet exist
+# (if - for example - you're using redcap names)
+if not 'nspn_id' in list(df_behav.columns):
+    df_behav['nspn_id'] = df_behav['id_nspn']
+
+# Rename the occ columns if you're using redcap names
+mask = df_behav['occ'] == 'iua_baseline'
+df_behav.loc[mask, 'occ'] = 'baseline'
+
+mask = df_behav['occ'] == 'iua_6_month'
+df_behav.loc[mask, 'occ'] = '6_month'
+
+mask = df_behav['occ'] == 'iua_fu1'
+df_behav.loc[mask, 'occ'] = '1st_follow_up'
+
 # Drop rows in df_behav where nspn_id is missing
 df_behav.dropna(subset=['nspn_id'], inplace=True)
 
