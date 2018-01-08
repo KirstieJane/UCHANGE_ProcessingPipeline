@@ -56,6 +56,17 @@ def read_in_arguments():
         print ("data_dir does not exist, check {}".format(data_dir))
         usage()
 
+    return data_dir
+
+def get_sub_list(data_dir):
+
+    sub_dir = os.path.join(data_dir, 'SUB_DATA')
+    sub_list = [ os.path.basename(x) for x in glob.glob('{}/*'.format(sub_dir)) ]
+
+    print(sub_list)
+    sub_list.remove('fsaverageSubP')
+
+    return sub_list
 
 #---------------------------------
 # HERE WE GO!
@@ -63,4 +74,6 @@ def read_in_arguments():
 
 if __name__ == "__main__":
 
-    read_in_arguments()
+    data_dir = read_in_arguments()
+
+    #sub_list = get_sub_list(data_dir)
