@@ -76,4 +76,4 @@ if __name__ == "__main__":
 
     data_dir = read_in_arguments()
 
-    #sub_list = get_sub_list(data_dir)
+    sub_list = get_sub_list(data_dir)
