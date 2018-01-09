@@ -170,12 +170,21 @@ def write_subject_level_report(data_dir, df):
 def write_summary_report(data_dir, df):
 
     now = datetime.datetime.now()
-    report_name = now.strftime('Summary-0-NumberMPMfiles-%Y%m%d-%H%M.csv')
+    report_name = now.strftime('Summary-0-NumberMPMfiles-%Y%m%d-%H%M.md')
 
     if not os.path.isdir(os.path.join(data_dir, 'data-check-reports')):
         os.makedirs(os.path.join(data_dir, 'data-check-reports'))
 
-    summary_info_list = []
+    # Set up the markdown table
+    summary_info_list = [ '## Summary Report',
+                          '',
+                          'Report on number of MPM files at different stages of processing',
+                          '',
+                          'Data Directory: **{}**'.format(os.path.abspath(data_dir)),
+                          'Run on: **{}**'.format(now.strftime('%Y-%m-%d at %H:%M')),
+                          '',
+                          '| Category | Occ |  N  | Check |',
+                          '| -------- | --- | ---:|:-----:|' ]
 
     preferred_order_occ_list = [ 'baseline', '6_month', '1st_follow_up']
 
@@ -189,20 +198,24 @@ def write_summary_report(data_dir, df):
                       'complete-mpm-brain' : 'complete brain extracted MPM',
                       'part-mpm-brain'     : 'partial brain extracted MPM' }
 
-    for occ, col in it.product(occ_list, df.columns[2:]):
+    for col, occ in it.product(df.columns[2:], occ_list):
         mask = (df['occ']==occ) & (df[col]==1)
         n = df.loc[mask, col].count()
         col_text = col_text_dict[col]
         check_text = ''
 
         if col.startswith('part') & (n > 0):
-            check_text = ' ***CHECK***'
+            check_text = ':x:'
 
-        text = 'N {} at {}'.format(col_text, occ)
-        summary_info_list += [ '{:<60} : {:>3.0f}{}'.format(text, n,
-                                                                    check_text) ]
+        # Don't bother to repeat the column text over
+        # and over, just leave the second (and later)
+        # cells blank to make the table more readable
+        if not occ == occ_list[0]:
+            col_text = ''
 
-    summary_info_list += ['']
+        summary_info_list += [ '| {} | {} | {:>3.0f} | {} |'.format(col_text, occ, n, check_text) ]
+
+    summary_info_list += [' ']
 
     # Write each of these items onto a new row in the output file
     with open(os.path.join(data_dir, 'data-check-reports', report_name), "w") as f:
