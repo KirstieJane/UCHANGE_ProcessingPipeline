@@ -181,7 +181,7 @@ def write_summary_report(data_dir, df):
                           'Report on number of MPM files at different stages of processing',
                           '',
                           'Data Directory: **{}**'.format(os.path.abspath(data_dir)),
-                          'Run on: **{}**'.format(now.strftime('%Y %m %d at %H:%M')),
+                          'Run on: **{}**'.format(now.strftime('%Y-%m-%d at %H:%M')),
                           '',
                           '| Category | Occ |  N  | Check |',
                           '| -------- | --- | ---:|:-----:|' ]
