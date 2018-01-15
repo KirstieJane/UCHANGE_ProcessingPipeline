@@ -8,7 +8,7 @@ the raw file (eg: MT.nii.gz), the head extracted file
 
 Two output files are created:
   * SubjectInfo-0-NumberMPMfiles-[DATE&TIME].csv
-  * Summary-0-NumberMPMfiles-[DATE&TIME].csv
+  * Summary-0-NumberMPMfiles-[DATE&TIME].md
 
 The summary info will tell you if everything looks ok, the subject info
 file will allow you to go in and CHECK any of the problems that the summary
