@@ -50,7 +50,7 @@ def read_in_arguments():
     and exit.
     """
     # Check that one argument has been passed
-    if len(sys.argv) <> 2:
+    if len(sys.argv) != 2:
         print ("Not the right number of arguments passed")
         usage()
 
@@ -80,7 +80,10 @@ def get_sub_list(data_dir):
 
 
 def get_occ_list(data_dir):
-
+    """
+    Figure out all the different timepoint occasions that are in the sub_dir
+    and return them as a list
+    """
     sub_dir = os.path.join(data_dir, 'SUB_DATA')
     occ_list = [ os.path.basename(x) for x in glob('{}/*/MPM/*'.format(sub_dir)) ]
 
@@ -107,6 +110,10 @@ def mpm_exist(data_dir, sub, occ, suffix=''):
 
 
 def create_report(mpm_exists_dict, mpm_head_exists_dict, mpm_brain_exists_dict):
+    """
+    This function creates the dataframe that will be written into a report
+    in the write_subject_level_report and write_summary_report functions
+    """
 
     df_list = []
 
