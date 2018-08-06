@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-'''
+"""
 NSPN_rois_behavmerge.py
+
 Created on 22nd July 2014
 by Kirstie Whitaker
 kw401@cam.ac.uk
@@ -10,61 +11,68 @@ This code merges the output of freesurfer_combine_CT_stats.sh
 with a csv file containing nspn_id and occ to create a
 "behav_merge" file which is saved in a folder called FS_BEHAV
 which is created in the same folder as the behavioural file
-'''
+"""
 
-#=============================================================================
+# =============================================================================
 # IMPORTS
-#=============================================================================
+# =============================================================================
 # Make this code python 2 and 3 compatible
 from __future__ import print_function
 
 import pandas as pd
-import numpy as np
 from glob import glob
 import os
 import sys
 
-#=============================================================================
+# =============================================================================
 # FUNCTIONS
-#=============================================================================
+# =============================================================================
+
 
 def usage():
-    print ("USAGE freesurfer_rois_behavmerge.py <FS_ROIS_DIR> <BEHAV_FILE>")
+    """Print the usage function to the screen."""
+    print("USAGE freesurfer_rois_behavmerge.py <FS_ROIS_DIR> <BEHAV_FILE>")
+    print("  All the output files will be written out into the same\n" +
+          "   directory as the behav_file. Recommended usage is to put the\n" +
+          "   behavioural file in a sensibly named subfolder so you don't\n" +
+          "   fill up a parent folder with lots of versions of the files")
     sys.exit()
 
-#=============================================================================
+# =============================================================================
 # READ IN COMMAND LINE ARGUMENTS
-#=============================================================================
+# =============================================================================
+
+
 # Check that two arguments have been passed
 if len(sys.argv) < 2:
-    print ("Not enough arguments passed")
+    print("Not enough arguments passed")
     usage()
 
 # Get the fs_rois_dir from the command line
 if not sys.argv[1]:
-    print ("Can't find FS_ROIS directory")
+    print("Can't find FS_ROIS directory")
     usage()
 else:
-    fs_rois_dir=sys.argv[1]
+    fs_rois_dir = sys.argv[1]
 
 # Get the full path to the behaviour csv file
 if sys.argv[2]:
-    behav_file=sys.argv[2]
+    behav_file = sys.argv[2]
     if not os.path.isfile(behav_file):
-        print ("Can't find behav_file")
+        print("Can't find behav_file")
         usage()
 else:
-     print ("Can't find behav_file")
-     usage()
+    print("Can't find behav_file")
+    usage()
 
-#=============================================================================
+# =============================================================================
 # READ IN BEHAVIOURAL FILE
-#=============================================================================
+# =============================================================================
 df_behav = pd.read_csv(behav_file)
 
 # Create the nspn_id column if it doesn't yet exist
 # (if - for example - you're using redcap names)
-if not 'nspn_id' in list(df_behav.columns):
+if 'nspn_id' not in list(df_behav.columns):
     df_behav['nspn_id'] = df_behav['id_nspn']
 
 # Rename the occ columns if you're using redcap names
@@ -81,18 +89,18 @@ df_behav.loc[mask, 'occ'] = '1st_follow_up'
 df_behav.dropna(subset=['nspn_id'], inplace=True)
 
 suffix = os.path.basename(behav_file).split('.csv')[0]
-print (suffix)
+print(suffix)
 
-#=============================================================================
+# =============================================================================
 # MERGE MEASURES WITH BEHAV VALUES
-#=============================================================================
+# =============================================================================
 # Create a list of the freesurfer measures
-measure_list = [ 'mean', 'area',
-                    'volume', 'thickness',
-                    'thicknessstd',
-                    'meancurv', 'gauscurv',
-                    'foldind', 'curvind',
-                     'std' ]
+measure_list = ['mean', 'area',
+                'volume', 'thickness',
+                'thicknessstd',
+                'meancurv', 'gauscurv',
+                'foldind', 'curvind',
+                'std']
 
 # Create an empty file list
 file_list = []
@@ -104,8 +112,8 @@ for measure in measure_list:
     file_list += glob(os.path.join(fs_rois_dir, '*{}.csv'.format(measure)))
 
 # Loop through the files
-for f in file_list:
-    print (f)
+for f in sorted(file_list):
+    print(f)
     # Check the number of lines that are in the file
     with open(f) as fid:
         num_lines = len(fid.readlines())
@@ -126,7 +134,7 @@ for f in file_list:
 
             # Drop columns containing the word 'Measure'
             # if they exist
-            c_drop = [ x for x in df.columns if 'Measure' in x ]
+            c_drop = [x for x in df.columns if 'Measure' in x]
             if c_drop:
                 df.drop(c_drop, inplace=True, axis=1)
 
@@ -140,4 +148,4 @@ for f in file_list:
             # Put this file in the same folder as the behavioural file
             behav_dir = os.path.dirname(behav_file)
             f_out = os.path.join(behav_dir, f_out)
-            df.to_csv(f_out,float_format='%.5f')
+            df.to_csv(f_out, float_format='%.5f', index=False)
