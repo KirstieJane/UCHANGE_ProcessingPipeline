@@ -132,9 +132,10 @@ for f in sorted(file_list):
             # Sort into ascending nspn_id
             df.sort_values(by='nspn_id', inplace=True)
 
-            # Drop columns containing the word 'Measure' or
+            # Drop the eTIV.1 and columns containing the word 'Measure' or
             # the words 'Unknown' or 'unknown' if they exist
-            exclude_terms = ['Measure', 'Unknown', 'unknown']
+            exclude_terms = ['Measure', 'Unknown', 'unknown', 
+                             'eTIV.1', 'BrainSegVolNotVent.1']
             c_drop = []
 
             for exclude_term in exclude_terms:
