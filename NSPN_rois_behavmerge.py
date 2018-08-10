@@ -132,12 +132,17 @@ for f in sorted(file_list):
             # Sort into ascending nspn_id
             df.sort_values(by='nspn_id', inplace=True)
 
-            # Drop columns containing the word 'Measure'
-            # if they exist
-            c_drop = [x for x in df.columns if 'Measure' in x]
+            # Drop columns containing the word 'Measure' or
+            # the words 'Unknown' or 'unknown' if they exist
+            exclude_terms = ['Measure', 'Unknown', 'unknown']
+            c_drop = []
+
+            for exclude_term in exclude_terms:
+                c_drop += [x for x in df.columns if exclude_term in x]
+
             if c_drop:
                 df.drop(c_drop, inplace=True, axis=1)
-
+    
             # Create an output file name that removes any '.' symbols
             # in the file name
             f_name = os.path.basename(f)
