@@ -143,7 +143,7 @@ if [[ -f ${SUBJECTS_DIR}/${occ}/scripts/recon-all.done ]]; then
     fi
 
     if [[ ! -f ${SUBJECTS_DIR}/${occ}/dmri.bedpostX/mean_fsumsamples.nii.gz ]]; then
-        trac-all -bedp -c ${SUBJECTS_DIR}/dmrirc_${occ} -no-isrunning 
+        bedpostx ${SUBJECTS_DIR}/${occ}/dmri 
     fi
 
     if [[ ! -f ${SUBJECTS_DIR}/${occ}/scripts/trac-paths.done ]]; then
