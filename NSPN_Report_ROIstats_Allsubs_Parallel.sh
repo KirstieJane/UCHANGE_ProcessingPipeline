@@ -328,7 +328,7 @@ else # For all the other measure options we're going to extract mean and std
 
             # Loop through 20 absolute depth steps from 0.1mm below cortex
             # to 2mm below cortex in steps of 0.1mm
-            for dist in `seq -f %+02.2f 0 -0.1 -2`; do
+            for dist in `seq -f %+02.2f -0.1 -0.1 -2`; do
 
                 for hemi in lh rh; do
 
