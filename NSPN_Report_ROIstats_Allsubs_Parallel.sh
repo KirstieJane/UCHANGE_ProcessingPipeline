@@ -83,13 +83,13 @@ if [[ ${measure} != "freesurfer" ]]; then
             #===== NSPN_ID AND OCC VALUES ====================================
             # We need to edit the first two columns so they're nice and easily
             # readable with the nspn_ids etc
-            echo "nspn_id,occ" > ${data_dir}/FS_ROIS/nspn_id_col
+            echo "nspn_id,occ" > ${data_dir}/FS_ROIS/nspn_id_col_${measure}
             for fname in ${inputs[@]}; do
                 fname_parts=(`echo "${fname/${data_dir}/}" | tr "/" " "`)
                 sub=${fname_parts[1]}
                 occ=${fname_parts[3]}
 
-                echo ${sub},${occ} >> ${data_dir}/FS_ROIS/nspn_id_col
+                echo ${sub},${occ} >> ${data_dir}/FS_ROIS/nspn_id_col_${measure}
             done
 
             # Write out each statistic
@@ -107,7 +107,7 @@ if [[ ${measure} != "freesurfer" ]]; then
                                 --meas ${stat}
 
                 # Now paste the data together
-                paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+                paste -d , ${data_dir}/FS_ROIS/nspn_id_col_${measure} \
                             ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}_temp.csv \
                                 > ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
 
@@ -121,8 +121,8 @@ if [[ ${measure} != "freesurfer" ]]; then
                 rm ${data_dir}/FS_ROIS/*temp.csv
             done
 
-        # Get rid of the nspn_id_col file ready for the next loop
-        rm ${data_dir}/FS_ROIS/nspn_id_col
+        # Get rid of the nspn_id_col_${measure} file ready for the next loop
+        rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         else
             echo "    No input files for ${measure}_${seg}!"
@@ -163,16 +163,16 @@ if [[ ${measure} == "freesurfer" ]]; then
 
                 # But save it for later!
                 cut -d, -f1 ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_${hemi}_temptemp.csv \
-                        > ${data_dir}/FS_ROIS/nspn_id_col
+                        > ${data_dir}/FS_ROIS/nspn_id_col_${measure}
             done
 
-            sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|${hemi}.${parc}.${measure}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col
+            sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|${hemi}.${parc}.${measure}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             # Now paste the data together
-            paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+            paste -d , ${data_dir}/FS_ROIS/nspn_id_col_${measure} \
                     ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_lh_temp.csv \
                     ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_rh_temp.csv \
                         > ${data_dir}/FS_ROIS/PARC_${parc}_${measure}.csv
@@ -185,7 +185,7 @@ if [[ ${measure} == "freesurfer" ]]; then
 
             # Remove the temporary files
             rm ${data_dir}/FS_ROIS/*temp.csv
-            rm ${data_dir}/FS_ROIS/nspn_id_col
+            rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         done # Close the measure loop
 
@@ -221,16 +221,16 @@ if [[ ${measure} == "freesurfer" ]]; then
 
                 # But save it for later!
                 cut -d, -f1 ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_${stat_name}_${hemi}_temptemp.csv \
-                        > ${data_dir}/FS_ROIS/nspn_id_col
+                        > ${data_dir}/FS_ROIS/nspn_id_col_${measure}
             done # Close the hemi loop
 
-            sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|${hemi}.${parc}.${measure}.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col
+            sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|${hemi}.${parc}.${measure}.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             # Now paste the data together
-            paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+            paste -d , ${data_dir}/FS_ROIS/nspn_id_col_${measure} \
                     ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_${stat_name}_lh_temp.csv \
                     ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_${stat_name}_rh_temp.csv \
                         > ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_${stat_name}.csv
@@ -243,7 +243,7 @@ if [[ ${measure} == "freesurfer" ]]; then
 
             # Remove the temporary files
             rm ${data_dir}/FS_ROIS/*temp.csv
-            rm ${data_dir}/FS_ROIS/nspn_id_col
+            rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         done # Close the stat loop
 
@@ -300,16 +300,16 @@ else # For all the other measure options we're going to extract mean and std
 
                     # But save it for later!
                     cut -d, -f1 ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_frac${frac}_${stat_name}_${hemi}_temptemp.csv \
-                            > ${data_dir}/FS_ROIS/nspn_id_col
+                            > ${data_dir}/FS_ROIS/nspn_id_col_${measure}
                 done # Close the hemi loop
 
-                sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col
-                sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col
-                sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col
-                sed -i "s|${hemi}.${parc}.${measure}_frac${frac}_expanded.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col
+                sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+                sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+                sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+                sed -i "s|${hemi}.${parc}.${measure}_frac${frac}_expanded.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
                 # Now paste the data together
-                paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+                paste -d , ${data_dir}/FS_ROIS/nspn_id_col_${measure} \
                         ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_frac${frac}_${stat_name}_lh_temp.csv \
                         ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_frac${frac}_${stat_name}_rh_temp.csv \
                             > ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_frac${frac}_${stat_name}.csv
@@ -322,7 +322,7 @@ else # For all the other measure options we're going to extract mean and std
 
                 # Remove the temporary files
                 rm ${data_dir}/FS_ROIS/*temp.csv
-                rm ${data_dir}/FS_ROIS/nspn_id_col
+                rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             done # Close frac loop
 
@@ -348,16 +348,16 @@ else # For all the other measure options we're going to extract mean and std
 
                     # But save it for later!
                     cut -d, -f1 ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_dist${dist}_${stat_name}_${hemi}_temptemp.csv \
-                            > ${data_dir}/FS_ROIS/nspn_id_col
+                            > ${data_dir}/FS_ROIS/nspn_id_col_${measure}
                 done # Close the hemi loop
 
-                sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col
-                sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col
-                sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col
-                sed -i "s|${hemi}.${parc}.${measure}_dist${dist}_expanded.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col
+                sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+                sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+                sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+                sed -i "s|${hemi}.${parc}.${measure}_dist${dist}_expanded.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
                 # Now paste the data together
-                paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+                paste -d , ${data_dir}/FS_ROIS/nspn_id_col_${measure} \
                         ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_dist${dist}_${stat_name}_lh_temp.csv \
                         ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_dist${dist}_${stat_name}_rh_temp.csv \
                             > ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_dist${dist}_${stat_name}.csv
@@ -370,7 +370,7 @@ else # For all the other measure options we're going to extract mean and std
 
                 # Remove the temporary files
                 rm ${data_dir}/FS_ROIS/*temp.csv
-                rm ${data_dir}/FS_ROIS/nspn_id_col
+                rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             done # Close dist loop
 
@@ -393,17 +393,17 @@ else # For all the other measure options we're going to extract mean and std
 
                 # But save it for later!
                 cut -d, -f1 ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_cortexAv_${stat_name}_${hemi}_temptemp.csv \
-                        > ${data_dir}/FS_ROIS/nspn_id_col
+                        > ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             done # Close the hemi loop
 
-            sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col
-            sed -i "s|${hemi}.${parc}.${measure}_cortexAv.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col
+            sed -i "s|${data_dir}/SUB_DATA/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|/SURFER/|,|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|/||g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
+            sed -i "s|${hemi}.${parc}.${measure}_cortexAv.${stat}|nspn_id,occ|g" ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             # Now paste the data together
-            paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+            paste -d , ${data_dir}/FS_ROIS/nspn_id_col_${measure} \
                     ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_cortexAv_${stat_name}_lh_temp.csv \
                     ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_cortexAv_${stat_name}_rh_temp.csv \
                         > ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_cortexAv_${stat_name}.csv
@@ -416,7 +416,7 @@ else # For all the other measure options we're going to extract mean and std
 
             # Remove the temporary files
             rm ${data_dir}/FS_ROIS/*temp.csv
-            rm ${data_dir}/FS_ROIS/nspn_id_col
+            rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         done # Close stat loop
     done # Close parc loop
