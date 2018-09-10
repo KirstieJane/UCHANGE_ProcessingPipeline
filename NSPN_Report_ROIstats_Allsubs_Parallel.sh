@@ -70,62 +70,65 @@ mkdir -p ${data_dir}/FS_ROIS/
 #=============================================================================
 # SEGMENTATIONS
 #=============================================================================
-# Loop through the various segmentations
-for seg in aseg wmparc lobesStrict; do
+if [[ ${measure} != "freesurfer" ]]; then
 
-    # Find all the individual stats files for that segmentation
-    inputs=(`ls -d ${data_dir}/SUB_DATA/*/SURFER/*/stats/${measure}_${seg}.stats 2> /dev/null `)
+    # Loop through the various segmentations
+    for seg in aseg wmparc lobesStrict; do
 
-    if [[ ${#inputs[@]} -gt 0 ]]; then
+        # Find all the individual stats files for that segmentation
+        inputs=(`ls -d ${data_dir}/SUB_DATA/*/SURFER/*/stats/${measure}_${seg}.stats 2> /dev/null `)
 
-        #===== NSPN_ID AND OCC VALUES ====================================
-        # We need to edit the first two columns so they're nice and easily
-        # readable with the nspn_ids etc
-        echo "nspn_id,occ" > ${data_dir}/FS_ROIS/nspn_id_col
-        for fname in ${inputs[@]}; do
-            fname_parts=(`echo "${fname/${data_dir}/}" | tr "/" " "`)
-            sub=${fname_parts[1]}
-            occ=${fname_parts[3]}
+        if [[ ${#inputs[@]} -gt 0 ]]; then
 
-            echo ${sub},${occ} >> ${data_dir}/FS_ROIS/nspn_id_col
-        done
+            #===== NSPN_ID AND OCC VALUES ====================================
+            # We need to edit the first two columns so they're nice and easily
+            # readable with the nspn_ids etc
+            echo "nspn_id,occ" > ${data_dir}/FS_ROIS/nspn_id_col
+            for fname in ${inputs[@]}; do
+                fname_parts=(`echo "${fname/${data_dir}/}" | tr "/" " "`)
+                sub=${fname_parts[1]}
+                occ=${fname_parts[3]}
 
-        # Write out each statistic
-        # This is silly because it loops over volume many times
-        # but to be honest, I think the code was looking super messy when
-        # I had it being faster. So just be patient and don't worry about
-        # speed ;)
+                echo ${sub},${occ} >> ${data_dir}/FS_ROIS/nspn_id_col
+            done
 
-        for stat in mean std volume; do
-            # Now write out the mean values for the measure
-            asegstats2table --inputs ${inputs[@]} \
-                            -t ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}_temp.csv \
-                            -d comma \
-                            --all-segs \
-                            --meas ${stat}
+            # Write out each statistic
+            # This is silly because it loops over volume many times
+            # but to be honest, I think the code was looking super messy when
+            # I had it being faster. So just be patient and don't worry about
+            # speed ;)
 
-            # Now paste the data together
-            paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
-                        ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}_temp.csv \
-                            > ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
+            for stat in mean std volume; do
+                # Now write out the mean values for the measure
+                asegstats2table --inputs ${inputs[@]} \
+                                -t ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}_temp.csv \
+                                -d comma \
+                                --all-segs \
+                                --meas ${stat}
 
-            # And replace all '-' with '_' because statsmodels in python
-            # likes that more :P but only for the first line
-            sed -i "1 s/-/_/g" ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
-            # And replace the : marker
-            sed -i "s/://g" ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
+                # Now paste the data together
+                paste -d , ${data_dir}/FS_ROIS/nspn_id_col \
+                            ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}_temp.csv \
+                                > ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
 
-            # Remove the temporary files
-            rm ${data_dir}/FS_ROIS/*temp.csv
-        done
+                # And replace all '-' with '_' because statsmodels in python
+                # likes that more :P but only for the first line
+                sed -i "1 s/-/_/g" ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
+                # And replace the : marker
+                sed -i "s/://g" ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
 
-    # Get rid of the nspn_id_col file ready for the next loop
-    rm ${data_dir}/FS_ROIS/nspn_id_col
+                # Remove the temporary files
+                rm ${data_dir}/FS_ROIS/*temp.csv
+            done
 
-    else
-        echo "    No input files for ${measure}_${seg}!"
-    fi
-done
+        # Get rid of the nspn_id_col file ready for the next loop
+        rm ${data_dir}/FS_ROIS/nspn_id_col
+
+        else
+            echo "    No input files for ${measure}_${seg}!"
+        fi
+    done
+fi
 
 #=============================================================================
 # PARCELLATIONS | Standard morphometric measures
@@ -325,7 +328,7 @@ else # For all the other measure options we're going to extract mean and std
 
             # Loop through 20 absolute depth steps from 0.1mm below cortex
             # to 2mm below cortex in steps of 0.1mm
-            for dist in `seq -f %+02.2f 0 -0.1 -2`; do
+            for dist in `seq -f %+02.2f -0.1 -0.1 -2`; do
 
                 for hemi in lh rh; do
 
