@@ -118,7 +118,7 @@ if [[ ${measure} != "freesurfer" ]]; then
                 sed -i "s/://g" ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}.csv
 
                 # Remove the temporary files
-                rm ${data_dir}/FS_ROIS/*temp.csv
+                rm ${data_dir}/FS_ROIS/SEG_${measure}_${seg}_${stat}_temp.csv
             done
 
         # Get rid of the nspn_id_col_${measure} file ready for the next loop
@@ -184,7 +184,7 @@ if [[ ${measure} == "freesurfer" ]]; then
             sed -i "s/://g" ${data_dir}/FS_ROIS/PARC_${parc}_${measure}.csv
 
             # Remove the temporary files
-            rm ${data_dir}/FS_ROIS/*temp.csv
+            rm ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_*temp.csv
             rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         done # Close the measure loop
@@ -242,7 +242,7 @@ if [[ ${measure} == "freesurfer" ]]; then
             sed -i "s/://g" ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_${stat_name}.csv
 
             # Remove the temporary files
-            rm ${data_dir}/FS_ROIS/*temp.csv
+            rm ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_*temp.csv
             rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         done # Close the stat loop
@@ -321,7 +321,7 @@ else # For all the other measure options we're going to extract mean and std
                 sed -i "s/://g" ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_frac${frac}_${stat_name}.csv
 
                 # Remove the temporary files
-                rm ${data_dir}/FS_ROIS/*temp.csv
+                rm ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_*temp.csv
                 rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             done # Close frac loop
@@ -369,7 +369,7 @@ else # For all the other measure options we're going to extract mean and std
                 sed -i "s/://g" ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_dist${dist}_${stat_name}.csv
 
                 # Remove the temporary files
-                rm ${data_dir}/FS_ROIS/*temp.csv
+                rm ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_*temp.csv
                 rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
             done # Close dist loop
@@ -415,7 +415,7 @@ else # For all the other measure options we're going to extract mean and std
             sed -i "s/://g" ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_cortexAv_${stat_name}.csv
 
             # Remove the temporary files
-            rm ${data_dir}/FS_ROIS/*temp.csv
+            rm ${data_dir}/FS_ROIS/PARC_${parc}_${measure}_*temp.csv
             rm ${data_dir}/FS_ROIS/nspn_id_col_${measure}
 
         done # Close stat loop
