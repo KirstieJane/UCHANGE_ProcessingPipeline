@@ -29,6 +29,12 @@ function usage {
     echo "Note that the measure 'freesufer' (quotes not included in the command)"
     echo "corresponds to pulling out the standard morphometric measures"
     echo "created by freesurfer such as thickness, curvature, area etc."
+    echo ""
+    echo "If you want to run this command for only one parcellation"
+    echo "you can pass the name of the parcellation as an optional third"
+    echo "argument."
+    echo "For example:"
+    echo "NSPN_Report_ROIstats_Allsubs.sh . A HCP"
     exit
 }
 
@@ -38,6 +44,7 @@ function usage {
 
 data_dir=$1
 measure=$2
+parc=$3
 
 if [[ ! -d ${data_dir} ]]; then
     "Data dir doesn't exist. Check: ${data_dir}"
@@ -61,6 +68,24 @@ seg_list=(aseg wmparc lobesStrict)
 # This is hard coded but could be adjusted in future iterations
 parc_list=(aparc 500.aparc lobesStrict HCP Yeo2011_7Networks_N1000 economo)
 
+# If you've passed a parcellation, then you're only going to run that
+# specific parcellation.
+if [[ ! -z ${parc} ]]; then
+
+    # If the parc you've given is in seg_list then replace
+    # seg_list with that parcellation
+    for seg in ${seg_list[@]}; do
+        if [[ ${parc} == ${seg} ]]; then
+            seg_list=(${parc})
+            parc_list=()
+            break
+        else
+            seg_list=()
+            parc_list=(${parc})
+        fi
+    done
+fi
+
 #=============================================================================
 # GET STARTED
 #=============================================================================
@@ -73,7 +98,7 @@ mkdir -p ${data_dir}/FS_ROIS/
 if [[ ${measure} != "freesurfer" ]]; then
 
     # Loop through the various segmentations
-    for seg in aseg wmparc lobesStrict; do
+    for seg in ${seg_list[@]}; do
 
         # Find all the individual stats files for that segmentation
         inputs=(`ls -d ${data_dir}/SUB_DATA/*/SURFER/*/stats/${measure}_${seg}.stats 2> /dev/null `)
@@ -133,7 +158,7 @@ fi
 #=============================================================================
 # PARCELLATIONS | Standard morphometric measures
 #=============================================================================
-# Loop through the various parcellations to extract the 
+# Loop through the various parcellations to extract the
 # morphometric values that are created by freesurfer's recon-all
 
 subjects=(`ls -d ${data_dir}/SUB_DATA/*/SURFER/*/ 2> /dev/null`)
@@ -262,7 +287,7 @@ else # For all the other measure options we're going to extract mean and std
         # Extract "thickness" and "thicknessstd"
         # values from the projected maps
         # (This is a little "hack" for the aparcstats2table command
-        # to be able to extract mean and standard deviation for 
+        # to be able to extract mean and standard deviation for
         # quantitative maps)
         for stat in thickness thicknessstd; do
 
@@ -278,7 +303,7 @@ else # For all the other measure options we're going to extract mean and std
                 continue
             fi
 
-            # Loop through 11 fractional depths from 1.0 to 0.0 in 
+            # Loop through 11 fractional depths from 1.0 to 0.0 in
             # steps of 0.1 of the cortical thickness
             for frac in `seq -f %+02.2f 0 0.1 1`; do
 
