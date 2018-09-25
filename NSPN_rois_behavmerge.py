@@ -129,8 +129,12 @@ for f in sorted(file_list):
             # Merge on 'nspn_id' and 'occ'
             df = df_behav.merge(df_meas, on=['nspn_id', 'occ'])
 
-            # Sort into ascending nspn_id
-            df.sort_values(by='nspn_id', inplace=True)
+            # Sort into ascending nspn_id and - if available - age
+            sort_list = ['nspn_id']
+            if 'age' in df.columns:
+                sort_list += ['age']
+
+            df.sort_values(by=sort_list, inplace=True)
 
             # Drop the eTIV.1 and columns containing the word 'Measure' or
             # the words 'Unknown' or 'unknown' if they exist
@@ -162,6 +166,7 @@ for f in sorted(file_list):
                 new_cols = [ col.rsplit('_{}'.format(meas_suffix), 1)[0] for col in new_cols ]
             # Put these columns back into the data frame
             df.columns = new_cols
+
 
             # Create an output file name that removes any '.' symbols
             # in the file name
