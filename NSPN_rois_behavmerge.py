@@ -134,7 +134,7 @@ for f in sorted(file_list):
 
             # Drop the eTIV.1 and columns containing the word 'Measure' or
             # the words 'Unknown' or 'unknown' if they exist
-            exclude_terms = ['Measure', 'Unknown', 'unknown', 
+            exclude_terms = ['Measure', 'Unknown', 'unknown',
                              'eTIV.1', 'BrainSegVolNotVent.1']
             c_drop = []
 
@@ -143,7 +143,26 @@ for f in sorted(file_list):
 
             if c_drop:
                 df.drop(c_drop, inplace=True, axis=1)
-    
+
+            # Rename the roi columns so they don't have
+            # one of the various freesurfer measures at the end
+            suffix_list = [ 'area', 'curvind', 'foldind',
+                            'gauscurv', 'meancurv',
+                            'thickness', 'thicknessstd',
+                            'volume' ]
+            # Get the columns names
+            new_cols = df.columns
+            # Figure out the suffix in this file
+            # Note that this assumes that the last entry in the file
+            # is one of the ROIs
+            suffix = new_cols[-1].rsplit('_', 1)[1]
+            # If the suffix is in the list above, then strip it from
+            # the column names
+            if suffix in suffix_list:
+                new_cols = [ col.rsplit('_{}'.format(suffix), 1)[0] for col in new_cols ]
+            # Put these columns back into the data frame
+            df.columns = new_cols
+
             # Create an output file name that removes any '.' symbols
             # in the file name
             f_name = os.path.basename(f)
