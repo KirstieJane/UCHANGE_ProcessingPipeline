@@ -146,20 +146,20 @@ for f in sorted(file_list):
 
             # Rename the roi columns so they don't have
             # one of the various freesurfer measures at the end
-            suffix_list = [ 'area', 'curvind', 'foldind',
-                            'gauscurv', 'meancurv',
-                            'thickness', 'thicknessstd',
-                            'volume' ]
+            meas_suffix_list = [ 'area', 'curvind', 'foldind',
+                                 'gauscurv', 'meancurv',
+                                 'thickness', 'thicknessstd',
+                                 'volume' ]
             # Get the columns names
             new_cols = df.columns
             # Figure out the suffix in this file
             # Note that this assumes that the last entry in the file
             # is one of the ROIs
-            suffix = new_cols[-1].rsplit('_', 1)[1]
+            meas_suffix = new_cols[-1].rsplit('_', 1)[1]
             # If the suffix is in the list above, then strip it from
             # the column names
-            if suffix in suffix_list:
-                new_cols = [ col.rsplit('_{}'.format(suffix), 1)[0] for col in new_cols ]
+            if meas_suffix in meas_suffix_list:
+                new_cols = [ col.rsplit('_{}'.format(meas_suffix), 1)[0] for col in new_cols ]
             # Put these columns back into the data frame
             df.columns = new_cols
 
