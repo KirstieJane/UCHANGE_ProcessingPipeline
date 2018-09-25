@@ -135,9 +135,9 @@ for f in sorted(file_list):
             # Drop the eTIV.1 and columns containing the word 'Measure' or
             # the words 'Unknown' or 'unknown' if they exist
             exclude_terms = ['Measure', 'Unknown', 'unknown',
-                             'eTIV.1', 'BrainSegVolNotVent.1']
+                             'eTIV.1', 'BrainSegVolNotVent.1',
+                             '???', 'Unnamed']
             c_drop = []
-
             for exclude_term in exclude_terms:
                 c_drop += [x for x in df.columns if exclude_term in x]
 
