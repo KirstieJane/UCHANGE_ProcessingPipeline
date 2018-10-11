@@ -159,7 +159,11 @@ for f in sorted(file_list):
             # Figure out the suffix in this file
             # Note that this assumes that the last entry in the file
             # is one of the ROIs
-            meas_suffix = new_cols[-1].rsplit('_', 1)[1]
+            try:
+                meas_suffix = new_cols[-1].rsplit('_', 1)[1]
+            except IndexError:
+                print ('PROBLEM WITH {}'.format(f))
+                continue
             # If the suffix is in the list above, then strip it from
             # the column names
             if meas_suffix in meas_suffix_list:
