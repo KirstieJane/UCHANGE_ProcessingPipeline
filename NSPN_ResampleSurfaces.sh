@@ -25,7 +25,21 @@
 #      completed.
 #
 # OUTPUTS:
+#    The following files are created inside the relavent occasion
+#      directory in the subject's SURFER directory for right
+#      and left hemispheres, fractional depths between 1 and 0
+#      in 0.1 increments and absolute depths into white matter
+#      from -0.1 to -2.0 in 0.1mm increments.
 #
+#        surf/${hemi}.white_frac${frac}_expanded
+#          for example:
+#            surf/lh.white_frac+0.30_expanded
+#            surf/rh.white_frac+0.90_expanded
+#        surf/${hemi}.white_dist${dist}_expanded
+#          for example:
+#            surf/lh.white_dist-0.30_expanded
+#            surf/rh.white_dist-1.90_expanded
+
 #====================================================================
 
 #====================================================================
