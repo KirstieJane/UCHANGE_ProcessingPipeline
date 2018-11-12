@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 
 """
-CheckProcessing.py
+CheckProcessing_Subject.py
 
-Created on 15 October 2018
-Updated on 22 October 2018
+Created on 12 November 2018
 by Kirstie Whitaker
 kw401@cam.ac.uk
 
-This code loops over all subjects and all timepoints and reports back
-which files that *should* exist DO in fact exist :)
+This code looks at one subject and one occasion (timepoint) to
+check whether their data makes sense!
 """
 
 # =============================================================================
@@ -31,7 +30,7 @@ import sys
 
 def usage():
     """Print the usage function to the screen."""
-    print("USAGE CheckProcessing.py <STUDY_DIR> <SUBLIST>")
+    print("USAGE CheckProcessing_Subject.py <STUDY_DIR> <SUB> <OCC>")
     print("  ##All the output files will be written out into the same\n" +
           "   ##directory as the behav_file. Recommended usage is to put the\n" +
           "   ##behavioural file in a sensibly named subfolder so you don't\n" +
@@ -43,7 +42,7 @@ def usage():
 # =============================================================================
 
 # Check that two arguments have been passed
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     print("Not enough arguments passed")
     usage()
 
@@ -54,34 +53,10 @@ if not sys.argv[1]:
 else:
     study_dir = sys.argv[1]
 
-# Get the full path to the behaviour csv file
-if sys.argv[2]:
-    sublist_f = sys.argv[2]
-    if not os.path.isfile(sublist_f):
-        print("Can't find SUBLIST")
-        usage()
-else:
-    print("Can't find SUBLIST")
-    usage()
+# Get the subject and occasion information
+sub = sys.argv[2]
+occ = sys.argv[3]
 
-
-# =============================================================================
-# READ IN SUBJECT LIST
-# =============================================================================
-
-with open(sublist_f, 'r') as f:
-    sublist = [ line.strip() for line in f ]
-
-occlist = [ 'baseline', '6_month', '1st_follow_up' ]
-
-# =============================================================================
-# MAKE THE OUTPUT DIR
-# =============================================================================
-
-output_dir = os.path.join(study_dir, 'CheckProcessingResults')
-
-if not os.path.isdir(output_dir):
-    os.makedirs(output_dir)
 
 # =============================================================================
 # CHECK NSPN_Parcellations_PostEdits.sh
@@ -90,23 +65,18 @@ if not os.path.isdir(output_dir):
 # This section of the code looks for the annot files and parcellation volumes
 # from the four parcellations. It is expecting to find 16 files in total.
 
-columns = ['nspn_id', 'occ',
-           '500.aparc', 'Yeo2011_7Networks_N1000', 'HCP', 'economo']
+def check_parcellations_postedits(sub_path, output_dir):
+    """
+    Check that the NSPN_Parcellations_PostEdits.sh command has run correctly
+    """
+    columns = ['nspn_id', 'occ',
+            '500.aparc', 'Yeo2011_7Networks_N1000', 'HCP', 'economo']
 
-df = pd.DataFrame(columns=columns)
-
-for sub, occ in it.product(sublist, occlist):
-
-    # Create path to data for this subject and this occasion
-    sub_path = os.path.join(study_dir,
-                            'SUB_DATA',
-                            sub,
-                            'SURFER',
-                            occ)
+    df = pd.DataFrame(columns=columns)
 
     # Don't check if the T1.mgz file doesn't exist!
     if not os.path.isfile(os.path.join(sub_path, 'mri', 'T1.mgz')):
-        continue
+        return
 
     # Otherwise start a row to enter into the data frame
     df_row = { 'nspn_id' : sub,
@@ -139,16 +109,15 @@ for sub, occ in it.product(sublist, occlist):
 
     df = df.append(df_row, ignore_index=True)
 
-# Mark the ones that are missing information
-mask = df.loc[:, columns[2:]].sum(axis=1) == 16
+    # Mark the ones that are missing information
+    mask = df.loc[:, columns[2:]].sum(axis=1) == 16
 
-df['as_expected'] = 0
-df.loc[mask, 'as_expected'] = 1
+    df['as_expected'] = 0
+    df.loc[mask, 'as_expected'] = 1
 
-df.to_csv(os.path.join(output_dir, 'NSPN_Parcellations_PostEdits.csv'),
-          index=False)
+    df.to_csv(os.path.join(output_dir, 'NSPN_Parcellations_PostEdits.csv'),
+            index=False)
 
-# Now lets report back the rows that don't have what we though
 
 # =============================================================================
 # CHECK NSPN_AssignLobes.sh
@@ -157,22 +126,17 @@ df.to_csv(os.path.join(output_dir, 'NSPN_Parcellations_PostEdits.csv'),
 # This section of the code is looking for the lobes annot and volume files.
 # It is looking for 3 files in total.
 
-columns = ['nspn_id', 'occ', 'lobes']
+def check_assignlobes(sub_path, output_dir):
+    """
+    Check that the NSPN_AssignLobes.sh command has run correctly
+    """
+    columns = ['nspn_id', 'occ', 'lobes']
 
-df = pd.DataFrame(columns=columns)
-
-for sub, occ in it.product(sublist, occlist):
-
-    # Create path to data for this subject and this occasion
-    sub_path = os.path.join(study_dir,
-                            'SUB_DATA',
-                            sub,
-                            'SURFER',
-                            occ)
+    df = pd.DataFrame(columns=columns)
 
     # Don't check if the T1.mgz file doesn't exist!
     if not os.path.isfile(os.path.join(sub_path, 'mri', 'T1.mgz')):
-        continue
+        return
 
     # Otherwise start a row to enter into the data frame
     df_row = { 'nspn_id' : sub,
@@ -199,16 +163,15 @@ for sub, occ in it.product(sublist, occlist):
 
     df = df.append(df_row, ignore_index=True)
 
-# Mark the ones that are missing information
-mask = df.loc[:, 'lobes'] == 3
+    # Mark the ones that are missing information
+    mask = df.loc[:, 'lobes'] == 3
 
-df['as_expected'] = 0
-df.loc[mask, 'as_expected'] = 1
+    df['as_expected'] = 0
+    df.loc[mask, 'as_expected'] = 1
 
-df.to_csv(os.path.join(output_dir, 'NSPN_AssignLobes.csv'),
-          index=False)
+    df.to_csv(os.path.join(output_dir, 'NSPN_AssignLobes.csv'),
+            index=False)
 
-# Now lets report back the rows that don't have what we though
 
 # =============================================================================
 # CHECK NSPN_ResampleSurfaces.sh
@@ -217,22 +180,17 @@ df.to_csv(os.path.join(output_dir, 'NSPN_AssignLobes.csv'),
 # This section of the code is looking for all the fractional and distance
 # projected surfaces. It is looking for 62 files in total.
 
-columns = ['nspn_id', 'occ', 'lh_frac', 'rh_frac', 'lh_dist', 'rh_dist']
+def check_resamplesurfaces(sub_path, output_dir):
+    """
+    Check that the NSPN_ResampleSurfaces.sh command has run correctly
+    """
+    columns = ['nspn_id', 'occ', 'lh_frac', 'rh_frac', 'lh_dist', 'rh_dist']
 
-df = pd.DataFrame(columns=columns)
-
-for sub, occ in it.product(sublist, occlist):
-
-    # Create path to data for this subject and this occasion
-    sub_path = os.path.join(study_dir,
-                            'SUB_DATA',
-                            sub,
-                            'SURFER',
-                            occ)
+    df = pd.DataFrame(columns=columns)
 
     # Don't check if the T1.mgz file doesn't exist!
     if not os.path.isfile(os.path.join(sub_path, 'mri', 'T1.mgz')):
-        continue
+        return
 
     # Otherwise start a row to enter into the data frame
     df_row = { 'nspn_id' : sub,
@@ -267,38 +225,32 @@ for sub, occ in it.product(sublist, occlist):
 
     df = df.append(df_row, ignore_index=True)
 
-# Mark the ones that are missing information
-mask = df.loc[:, columns[2:]].sum(axis=1) == 62
+    # Mark the ones that are missing information
+    mask = df.loc[:, columns[2:]].sum(axis=1) == 62
 
-df['as_expected'] = 0
-df.loc[mask, 'as_expected'] = 1
+    df['as_expected'] = 0
+    df.loc[mask, 'as_expected'] = 1
 
-df.to_csv(os.path.join(output_dir, 'NSPN_ResampleSurfaces.csv'),
-          index=False)
+    df.to_csv(os.path.join(output_dir, 'NSPN_ResampleSurfaces.csv'),
+            index=False)
 
 
 # =============================================================================
 # CHECK NSPN_TransformQuantitativeMaps.sh
 # =============================================================================
 #
-# 
 
-columns = ['nspn_id', 'occ', 'dti', 'mpm']
+def check_transformquantitativemaps(sub_path, output_dir):
+    """
+    Check that the NSPN_TransformQuantitativeMaps.sh command has run correctly
+    """
+    columns = ['nspn_id', 'occ', 'dti', 'mpm']
 
-df = pd.DataFrame(columns=columns)
-
-for sub, occ in it.product(sublist, occlist):
-
-    # Create path to data for this subject and this occasion
-    sub_path = os.path.join(study_dir,
-                            'SUB_DATA',
-                            sub,
-                            'SURFER',
-                            occ)
+    df = pd.DataFrame(columns=columns)
 
     # Don't check if the T1.mgz file doesn't exist!
     if not os.path.isfile(os.path.join(sub_path, 'mri', 'T1.mgz')):
-        continue
+        return
 
     # Otherwise start a row to enter into the data frame
     df_row = { 'nspn_id' : sub,
@@ -330,15 +282,14 @@ for sub, occ in it.product(sublist, occlist):
 
     df = df.append(df_row, ignore_index=True)
 
-# Mark the ones that are missing information
-mask = df.loc[:, columns[2:]].sum(axis=1) == 9
+    # Mark the ones that are missing information
+    mask = df.loc[:, columns[2:]].sum(axis=1) == 9
 
-df['as_expected'] = 0
-df.loc[mask, 'as_expected'] = 1
+    df['as_expected'] = 0
+    df.loc[mask, 'as_expected'] = 1
 
-df.to_csv(os.path.join(output_dir, 'NSPN_TransformQuantitativeMaps.csv'),
-          index=False)
-
+    df.to_csv(os.path.join(output_dir, 'NSPN_TransformQuantitativeMaps.csv'),
+            index=False)
 
 # =============================================================================
 # CHECK NSPN_ExtractRois.sh PARCELLATIONS
@@ -346,35 +297,33 @@ df.to_csv(os.path.join(output_dir, 'NSPN_TransformQuantitativeMaps.csv'),
 #
 # This section of the code is looking for all the parcellation stats files!
 # There are LOTS of them across the different parcellations & frac/dist depths.
-# It is looking for 62 files in total.
+# Specifically it looks for 11 fractional depths and 20 absolute depths for
+# all of the DTI and MPM measures and for each of the different parcellations.
+# Note that the code does not YET check for the freesurfer outputs (thickness,
+# volume etc) nor the cortexAv values.
 
-cols = ['nspn_id', 'occ' ]
+def check_extractrois_parcellation(sub_path, output_dir):
+    """
+    Check that the NSPN_ExtractRois.sh command has run correctly
+    """
+    cols = ['nspn_id', 'occ' ]
 
-hemi_list = ['lh', 'rh']
+    hemi_list = ['lh', 'rh']
 
-parc_list = ['aparc', '500.aparc', 'lobesStrict',
-             'Yeo2011_7Networks_N1000', 'HCP', 'economo']
+    parc_list = ['aparc', '500.aparc', 'lobesStrict',
+                'Yeo2011_7Networks_N1000', 'HCP', 'economo']
 
-measure_list = ['MT', 'R1', 'R2s', 'A',
-                'FA', 'MD', 'L1', 'L23', 'MO']
+    measure_list = ['MT', 'R1', 'R2s', 'A',
+                    'FA', 'MD', 'L1', 'L23', 'MO']
 
-columns = cols + [ '{}_{}_{}'.format(hemi, parc, measure) 
-                    for hemi, parc, measure in it.product(hemi_list, parc_list, measure_list) ]
+    columns = cols + [ '{}_{}_{}'.format(hemi, parc, measure) 
+                        for hemi, parc, measure in it.product(hemi_list, parc_list, measure_list) ]
 
-df = pd.DataFrame(columns=columns)
-
-for sub, occ in it.product(sublist, occlist):
-
-    # Create path to data for this subject and this occasion
-    sub_path = os.path.join(study_dir,
-                            'SUB_DATA',
-                            sub,
-                            'SURFER',
-                            occ)
+    df = pd.DataFrame(columns=columns)
 
     # Don't check if the T1.mgz file doesn't exist!
     if not os.path.isfile(os.path.join(sub_path, 'mri', 'T1.mgz')):
-        continue
+        return
 
     # Otherwise start a row to enter into the data frame
     df_row = { 'nspn_id' : sub,
@@ -411,16 +360,52 @@ for sub, occ in it.product(sublist, occlist):
                                                                                 depth))):
                 counter+=1
 
+        # Check the cortexAv file
+        if os.path.isfile(os.path.join(sub_path,
+                            'stats',
+                            '{}.{}.{}_cortexAv.stats'.format(hemi,
+                                                                parc,
+                                                                measure))):
+            counter+=1
+
         df_row['{}_{}_{}'.format(hemi, parc, measure)] = counter
 
     df = df.append(df_row, ignore_index=True)
 
-# Mark the ones that are missing information
-mask = df.loc[:, columns[2:]].sum(axis=1) == 3348
+    # Mark the ones that are missing information
+    mask = df.loc[:, columns[2:]].sum(axis=1) == 3456
 
-df['as_expected'] = 0
-df.loc[mask, 'as_expected'] = 1
+    df['as_expected'] = 0
+    df.loc[mask, 'as_expected'] = 1
 
-df.to_csv(os.path.join(output_dir, 'NSPN_ExtractRois_Parcellations.csv'),
-          index=False)
+    df.to_csv(os.path.join(output_dir, 'NSPN_ExtractRois_Parcellations.csv'),
+            index=False)
           
+
+
+
+if __name__ == '__main__':
+    # =============================================================================
+    # MAKE THE OUTPUT DIR
+    # =============================================================================
+
+    sub_path = os.path.join(study_dir,
+                            'SUB_DATA',
+                            sub,
+                            'SURFER',
+                            occ)
+
+    output_dir = os.path.join(sub_path, 'CheckProcessingResults_Subject')
+
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+
+    # =============================================================================
+    # Run the checks!
+    # =============================================================================
+
+    check_parcellations_postedits(sub_path, output_dir)
+    check_assignlobes(sub_path, output_dir)
+    check_resamplesurfaces(sub_path, output_dir)
+    check_transformquantitativemaps(sub_path, output_dir)
+    check_extractrois_parcellation(sub_path, output_dir)
