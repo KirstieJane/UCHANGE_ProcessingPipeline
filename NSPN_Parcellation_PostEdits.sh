@@ -4,7 +4,7 @@
 # Created by Kirstie Whitaker on 25th April 2016
 #
 # DESCRIPTION:
-#    This code creates the 308 parcellation for each person in their
+#    This code creates a few parcellations for each person in their
 #      freesurfer space, and should be applied after recon-all edits
 #      have been completed.
 #
@@ -31,9 +31,15 @@
 #    The following files are created inside the relavent occasion
 #      directory in the subject's SURFER directory:
 #
-#        parcellation/500.aparc.nii.gz
-#        label/lh.500.aparc.annot
-#        label/rh.500.aparc.annot
+#        parcellation/${parcellation}.nii.gz
+#        parcellation/${parcellation}_renum.nii.gz
+#          for example:
+#            parcellation/500.aparc.nii.gz
+#            parcellation/500.aparc_renum.nii.gz
+#        label/${hemi}.${parcellation}.annot
+#          for example:
+#            label/lh.500.aparc.annot
+#            label/rh.500.aparc.annot
 #
 #====================================================================
 

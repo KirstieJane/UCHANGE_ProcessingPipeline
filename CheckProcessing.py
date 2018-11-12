@@ -86,7 +86,7 @@ if not os.path.isdir(output_dir):
 # =============================================================================
 # CHECK NSPN_Parcellations_PostEdits.sh
 # =============================================================================
-#
+# 
 # This section of the code looks for the annot files and parcellation volumes
 # from the four parcellations. It is expecting to find 16 files in total.
 
