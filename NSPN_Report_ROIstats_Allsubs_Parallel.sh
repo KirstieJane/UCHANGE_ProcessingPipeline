@@ -305,8 +305,11 @@ else # For all the other measure options we're going to extract mean and std
 
             # Loop through 11 fractional depths from 1.0 to 0.0 in
             # steps of 0.1 of the cortical thickness
-            for frac in `seq -f %+02.2f 0 0.1 1`; do
-
+            # for frac in `seq -f %+02.2f 0 0.1 1`; do
+            # Commented out to make the scripts run a little faster
+            # during testing. The line below only runs 0.0 0.3 1.0
+            for frac in +0.00 +0.30 +1.00; do
+                echo -n "      Frac: ${frac}"
                 for hemi in lh rh; do
 
                     # Combine stats for all subjects for each measure and for each
@@ -353,8 +356,10 @@ else # For all the other measure options we're going to extract mean and std
 
             # Loop through 20 absolute depth steps from 0.1mm below cortex
             # to 2mm below cortex in steps of 0.1mm
-            for dist in `seq -f %+02.2f -0.1 -0.1 -2`; do
-
+            # for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
+            # Commented out to make the scripts run a little faster
+            # during testing. The line below only runs 1mm and 2mm.
+            for dist in -1.00 -2.00; do
                 for hemi in lh rh; do
 
                     # Combine stats for all subjects for each measure and for each

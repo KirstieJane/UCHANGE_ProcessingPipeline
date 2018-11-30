@@ -259,7 +259,10 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
 
             # Loop through a bunch of different fractional depths
             # from the white matter surface
-            for frac in `seq -f %+02.2f 0.0 0.1 1.0`; do
+            # for frac in `seq -f %+02.2f 0.0 0.1 1.0`; do
+            # Commented out to make the scripts run a little faster
+            # during testing. The line below only runs 0.0 0.3 1.0
+            for frac in +0.00 +0.30 +1.00; do
                 echo -n "      Frac: ${frac}"
 
                 # Project the values to the surface
@@ -297,7 +300,10 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
 
             # Now loop through the different absolute depths
             # from the grey/white matter boundary
-            for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
+            # for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
+            # Commented out to make the scripts run a little faster
+            # during testing. The line below only runs 1mm and 2mm.
+            for dist in -1.00 -2.00; do
                 echo -n "      Dist: ${dist}"
 
                 # Project the values to the surface

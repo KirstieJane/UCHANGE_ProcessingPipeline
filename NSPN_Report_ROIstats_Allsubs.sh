@@ -221,8 +221,10 @@ for parc in aparc 500.aparc lobesStrict HCP Yeo2011_7Networks_N1000 economo; do
 		echo "No ${measure} file - skipping"
 	        continue
 	    fi
-            for frac in `seq -f %+02.2f 0 0.1 1`; do
-
+            # for frac in `seq -f %+02.2f 0 0.1 1`; do
+            # Commented out to make the scripts run a little faster
+            # during testing. The line below only runs 0.0 0.3 1.0
+            for frac in +0.00 +0.30 +1.00; do
                 for hemi in lh rh; do
 
                     # Combine stats for all subjects for each measure and for each
@@ -267,8 +269,11 @@ for parc in aparc 500.aparc lobesStrict HCP Yeo2011_7Networks_N1000 economo; do
 
             done # Close frac loop
 
-            for dist in `seq -f %+02.2f 0 -0.1 -2`; do
-
+            # for dist in `seq -f %+02.2f -2 0.1 -0.1`; do
+            # Commented out to make the scripts run a little faster
+            # during testing. The line below only runs 1mm and 2mm.
+            for dist in -1.00 -2.00; do
+            
                 for hemi in lh rh; do
 
                     # Combine stats for all subjects for each measure and for each
