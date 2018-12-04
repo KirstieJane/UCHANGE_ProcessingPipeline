@@ -130,10 +130,7 @@ fi
 #     lobesStrict
 #=============================================================================
 
-# for measure in MT R1 R2s A FA MD MO L1 L23; do
-# Commented out to make the scripts run a little faster
-# during testing. The line below only runs MT
-for measure in MT; do
+for measure in MT R1 R2s A FA MD MO L1 L23; do
     if [[ -f ${surfer_dir}/mri/${measure}.mgz ]]; then
 
         echo -ne "  ${measure} segmentations:\t"
@@ -221,10 +218,7 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
         echo " - done!"
 
         # Next loop through all the different MPM and DTI files
-        # for measure in MT R1 R2s A FA MD MO L1 L23; do
-        # Commented out to make the scripts run a little faster
-        # during testing. The line below only runs MT
-        for measure in MT; do
+        for measure in MT R1 R2s A FA MD MO L1 L23; do
             if [[ ! -s ${surfer_dir}/mri/${measure}.mgz ]]; then
                 echo "    ${measure} does not exist, skipping"
                 continue
