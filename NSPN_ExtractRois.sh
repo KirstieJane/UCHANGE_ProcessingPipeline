@@ -136,7 +136,12 @@ for measure in MT R1 R2s A FA MD MO L1 L23; do
         echo -ne "  ${measure} segmentations:\t"
         #=== wmparc
         echo -n " wmparc"
-        if [[ ! -s ${surfer_dir}/stats/${measure}_wmparc.stats ]]; then
+        # Don't run the command if the file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the segmentation file 
+        if [[ ! -s ${surfer_dir}/stats/${measure}_wmparc.stats \
+                || ${surfer_dir}/mri/wmparc.mgz -nt \
+                   ${surfer_dir}/stats/${measure}_wmparc.stats ]]; then
             mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
                          --seg ${surfer_dir}/mri/wmparc.mgz \
                          --ctab ${FREESURFER_HOME}/WMParcStatsLUT.txt \
@@ -147,7 +152,12 @@ for measure in MT R1 R2s A FA MD MO L1 L23; do
 
         #=== aseg
         echo -n " aseg"
-        if [[ ! -s ${surfer_dir}/stats/${measure}_aseg.stats ]]; then
+        # Don't run the command if the file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the segmentation file 
+        if [[ ! -s ${surfer_dir}/stats/${measure}_aseg.stats \
+                || ${surfer_dir}/mri/aseg.mgz -nt \
+                   ${surfer_dir}/stats/${measure}_aseg.stats ]]; then
             mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
                          --seg ${surfer_dir}/mri/aseg.mgz \
                          --sum ${surfer_dir}/stats/${measure}_aseg.stats \
@@ -158,7 +168,12 @@ for measure in MT R1 R2s A FA MD MO L1 L23; do
 
         #=== lobesStrict
         echo -n " lobesStrict"
-        if [[ ! -s ${surfer_dir}/stats/${measure}_lobesStrict.stats ]]; then
+        # Don't run the command if the file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the segmentation file 
+        if [[ ! -s ${surfer_dir}/stats/${measure}_lobesStrict.stats \
+                || ${surfer_dir}/mri/lobes+aseg.mgz -nt \
+                   ${surfer_dir}/stats/${measure}_lobesStrict.stats ]]; then
             mri_segstats --i ${surfer_dir}/mri/${measure}.mgz \
                          --seg ${surfer_dir}/mri/lobes+aseg.mgz \
                          --sum ${surfer_dir}/stats/${measure}_lobesStrict.stats \
@@ -196,8 +211,14 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
         # First extract just the thickness & curvature values
         echo "    Standard parcellations"
         echo -n "      Extracting stats"
-        if [[ ! -s ${surfer_dir}/stats/${hemi}.${parc}.stats \
-                && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+        # Don't run the command if the the annot file doesn't exist
+        # and don't run the command if the output file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the annot file 
+        if [[ -f ${surfer_dir}/label/${hemi}.${parc}.annot \
+                && ( ! -s ${surfer_dir}/stats/${hemi}.${parc}.stats \
+                   || ( ${surfer_dir}/label/${hemi}.${parc}.annot -nt \
+                        ${surfer_dir}/stats/${hemi}.${parc}.stats ) ) ]]; then
             echo ""
             mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                     -f ${surfer_dir}/stats/${hemi}.${parc}.stats \
@@ -206,8 +227,14 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
         fi
 
         # Also extract sulcal depth
-        if [[ ! -s ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
-                && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+        # Don't run the command if the the annot file doesn't exist
+        # and don't run the command if the output file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the annot file 
+        if [[ -f ${surfer_dir}/label/${hemi}.${parc}.annot \
+                && ( ! -s ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
+                   || ( ${surfer_dir}/label/${hemi}.${parc}.annot -nt \
+                        ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats ) ) ]]; then
             echo ""
             mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
                                     -f ${surfer_dir}/stats/${hemi}.${parc}.sulcdepth.stats \
@@ -244,8 +271,14 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
 
             # Calculate the stats
             echo -n " Extracting stats"
-            if [[ ! -s ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats \
-                        && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+            # Don't run the command if the the annot file doesn't exist
+            # and don't run the command if the output file already exists
+            # but DO run the command if the file that exists is OLDER
+            # than the annot file 
+            if [[ -f ${surfer_dir}/label/${hemi}.${parc}.annot \
+                    && ( ! -s ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats \
+                    || ( ${surfer_dir}/label/${hemi}.${parc}.annot -nt \
+                            ${surfer_dir}/stats/${hemi}.${parc}.${measure}_cortexAv.stats ) ) ]]; then
 
                 echo ""
                 mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
@@ -284,8 +317,14 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
 
                 # Calculate the stats
                 echo -n " Extracting stats"
-                if [[ ! -s ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats \
-                            && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+                # Don't run the command if the the annot file doesn't exist
+                # and don't run the command if the output file already exists
+                # but DO run the command if the file that exists is OLDER
+                # than the annot file 
+                if [[ -f ${surfer_dir}/label/${hemi}.${parc}.annot \
+                        && ( ! -s ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats \
+                        || ( ${surfer_dir}/label/${hemi}.${parc}.annot -nt \
+                                ${surfer_dir}/stats/${hemi}.${parc}.${measure}_frac${frac}_expanded.stats ) ) ]]; then
 
                     echo ""
                     mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
@@ -325,8 +364,14 @@ for parc in aparc 500.aparc lobesStrict Yeo2011_7Networks_N1000 HCP economo; do
 
                 # Calculate the stats
                 echo -n " Extracting stats"
-                if [[ ! -s ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats \
-                            && -f ${surfer_dir}/label/${hemi}.${parc}.annot ]]; then
+                # Don't run the command if the the annot file doesn't exist
+                # and don't run the command if the output file already exists
+                # but DO run the command if the file that exists is OLDER
+                # than the annot file 
+                if [[ -f ${surfer_dir}/label/${hemi}.${parc}.annot \
+                        && ( ! -s ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats \
+                        || ( ${surfer_dir}/label/${hemi}.${parc}.annot -nt \
+                                ${surfer_dir}/stats/${hemi}.${parc}.${measure}_dist${dist}_expanded.stats ) ) ]]; then
 
                     echo ""
                     mris_anatomical_stats -a ${surfer_dir}/label/${hemi}.${parc}.annot \
