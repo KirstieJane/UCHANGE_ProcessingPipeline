@@ -28,7 +28,6 @@ import sys
 # FUNCTIONS
 # =============================================================================
 
-
 def usage():
     """Print the usage function to the screen."""
     print("USAGE freesurfer_rois_behavmerge.py <FS_ROIS_DIR> <BEHAV_FILE>")
@@ -41,7 +40,6 @@ def usage():
 # =============================================================================
 # READ IN COMMAND LINE ARGUMENTS
 # =============================================================================
-
 
 # Check that two arguments have been passed
 if len(sys.argv) < 2:
