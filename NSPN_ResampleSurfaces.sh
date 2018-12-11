@@ -138,7 +138,12 @@ for hemi in lh rh; do
         # Create the interim surface by expanding the white matter surface by
         # the given fraction of thickness
         echo -n " expanding surface"
-        if [[ ! -f ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded ]]; then
+        # Don't run the command if the file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the pial surface file 
+        if [[ ! -s ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded \
+                || ${surfer_dir}/surf/${hemi}.white -nt \
+                    ${surfer_dir}/surf/${hemi}.white_frac${frac}_expanded ]]; then
 
             echo ""
             mris_expand -thickness \
@@ -161,7 +166,12 @@ for hemi in lh rh; do
         # Create the interim surface by expanding the white matter surface by
         # the given fraction of thickness
         echo -n " expanding surface into white matter"
-        if [[ ! -f ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded ]]; then
+        # Don't run the command if the file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the pial surface file 
+        if [[ ! -s ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded \
+                || ${surfer_dir}/surf/${hemi}.white -nt \
+                   ${surfer_dir}/surf/${hemi}.white_dist${dist}_expanded ]]; then
 
             echo ""
             mris_expand ${surfer_dir}/surf/${hemi}.white \
@@ -177,3 +187,4 @@ done # Close hemi loop
 #=============================================================================
 # Well done. You're all finished :)
 #=============================================================================
+

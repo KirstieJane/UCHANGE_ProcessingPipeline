@@ -107,7 +107,13 @@ echo "==== Assign Lobes ===="
 # First you have to pull together the labels
 # from the surface annotation files
 for hemi in lh rh; do
-    if [[ ! -f ${surfer_dir}/label/${hemi}.lobesStrict.annot ]]; then
+
+    # Don't run the command if the file already exists
+    # but DO run the command if the file that exists is OLDER
+    # than the pial surface file 
+    if [[ ! -s ${surfer_dir}/label/${hemi}.lobesStrict.annot \
+            || ${surfer_dir}/label/${hemi}.aparc.annot -nt \
+                ${surfer_dir}/label/${hemi}.lobesStrict.annot ]]; then
 
         echo "  Assigning lobe labels (${hemi})"
         mri_annotation2label --subject ${surf_sub} \
@@ -124,7 +130,12 @@ done
 #====================================================================
 # Transform the surface annotation into a segmentation volume
 # and label the white matter up to 5mm beneath the lobes
-if [[ ! -f ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
+# Don't run the command if the file already exists
+# but DO run the command if the file that exists is OLDER
+# than the pial surface file 
+if [[ ! -s ${surfer_dir}/mri/lobes+aseg.mgz \
+        || ${surfer_dir}/mri/aseg.mgz -nt \
+            ${surfer_dir}/mri/lobes+aseg.mgz ]]; then
 
     echo "  Assigning white matter 5mm below cortical surface to lobe labes"
 
@@ -140,3 +151,4 @@ fi
 #====================================================================
 # All done!
 #====================================================================
+

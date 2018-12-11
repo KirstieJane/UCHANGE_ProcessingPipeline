@@ -337,7 +337,11 @@ def check_extractrois_parcellation(sub_path, output_dir):
         counter=0
 
         # Check the fractional depths
-        for depth in np.arange(0, 1.01, 0.1):
+        # Note that this has been adjusted to only check for
+        # three fractional depths: 0.0, 0.3 and 1.0.
+        # The range can be changed to np.arange(0, 1.01, 0.1) if you want
+        # to cover all the different depths.
+        for depth in [0, 0.3, 1]:
 
             # Loop through the different files you're expecting to find
             if os.path.isfile(os.path.join(sub_path,
@@ -349,7 +353,11 @@ def check_extractrois_parcellation(sub_path, output_dir):
                 counter+=1
 
         # Check the dist depths
-        for depth in np.arange(-0.1, -2.01, -0.1):
+        # Note that this has been adjusted to only check for
+        # two depths: -1mm and -2mm.
+        # The range can be changed to (-0.1, -2.01, -0.1) if you want
+        # to cover all the different depths.
+        for depth in np.arange(-1.0, -2.01, -1.0):
 
             # Loop through the different files you're expecting to find
             if os.path.isfile(os.path.join(sub_path,

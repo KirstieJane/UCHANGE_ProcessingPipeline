@@ -127,8 +127,12 @@ for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP economo; do
     # Loop through both hemispheres
     for hemi in lh rh; do
 
-        # Check to see if output file already exists
-        if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.${parcellation}.annot ]]; then
+        # Don't run the command if the output file already exists
+        # but DO run the command if the file that exists is OLDER
+        # than the aparc.annot file 
+        if [[ ! -s ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.${parcellation}.annot \
+              || ( ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.aparc.annot -nt \
+                   ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.${parcellation}.annot ) ]]; then
 
             echo "        Creating ${hemi} ${parcellation} surface in subject space"
             # Transform the surface parcellation from fsaverage space
@@ -143,8 +147,12 @@ for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP economo; do
         fi
     done
 
-    # Check to see if volume parcellation file already exists
-    if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz ]]; then
+    # Don't run the command if the output file already exists
+    # but DO run the command if the file that exists is OLDER
+    # than the parcellation's annot file 
+    if [[ ! -s ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz \
+            || ( ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/label/${hemi}.${parcellation}.annot -nt \
+                ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz ) ]]; then
 
         # Transform indivual surface parcellation to individual volume parcellation
         echo "        Creating ${parcellation} volume in subject space"
@@ -159,8 +167,12 @@ for parcellation in 500.aparc Yeo2011_7Networks_N1000 HCP economo; do
 
     fi
 
-    # Check to see if renumbered volume parcellation file already exists
-    if [[ ! -f ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}_renum.nii.gz ]]; then
+    # Don't run the command if the output file already exists
+    # but DO run the command if the file that exists is OLDER
+    # than the parcellation's annot file 
+    if [[ ! -s ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}_renum.nii.gz \
+            || ( ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}.nii.gz -nt \
+                ${SUBJECTS_DIR}/${sub}/SURFER/${subjid}/parcellation/${parcellation}_renum.nii.gz ) ]]; then
 
         # Transform indivual surface parcellation to individual volume parcellation
         echo "        Renumbering ${parcellation} volume to consecutive counters"
@@ -178,3 +190,4 @@ done
 #====================================================================
 # All done!
 #====================================================================
+
