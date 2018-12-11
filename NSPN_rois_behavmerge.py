@@ -79,7 +79,7 @@ if 'nspn_id' not in list(df_behav.columns):
 mask = df_behav['occ'] == 'iua_baseline'
 df_behav.loc[mask, 'occ'] = 'baseline'
 
-mask = df_behav['occ'] == 'iua_6_month'
+mask = df_behav['occ'] == 'iua_6month'
 df_behav.loc[mask, 'occ'] = '6_month'
 
 mask = df_behav['occ'] == 'iua_fu1'
