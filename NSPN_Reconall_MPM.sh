@@ -1,13 +1,18 @@
 #!/bin/bash
 
 #====================================================================
-# Created by Kirstie Whitaker on 26th May 2016 
+# Created by Kirstie Whitaker on 26th May 2016
+# Updated on 12 February 2019
 #
 # DESCRIPTION:
 #    This code finds the MPM R1_head.nii.gz file and runs
 #      freesurfer's recon-all on it, applying the R1_brain.nii.gz 
 #      mask instead of allowing freesurfer to do its standard skull 
 #      strip.
+#    The update in Feburary 2019 makes much better use of "make"
+#      and allows for the possibility that you might want to start
+#      totally from scratch by deleting orig.mgz while keeping
+#      the surfaces that already exist.
 #
 # INPUTS:
 #    study_dir : The directory containing the SUB_DATA folder which
@@ -95,18 +100,15 @@ echo "==== Running Reconall ===="
 #====================================================================
 # AND GO!
 #====================================================================
-# If the process has already started then keep going
 
-if [[ -f  ${SUBJECTS_DIR}/${occ}/mri/nu.mgz ]]; then
-    
-    recon-all -subjid ${occ} \
-              -sd ${SUBJECTS_DIR} \
-              -make all
-else
+# If the surfer directory doesn't exist, then start from the very beginnning
+if [[ ! -d ${SUBJECTS_DIR}/${occ} ]]; then
 
-    rm -rf ${SUBJECTS_DIR}/${occ}
     mkdir -p ${SUBJECTS_DIR}
 
+    # Run most of autorecon1 but then copy across the 
+    # R1_brain mask as this is usually more reliable than
+    # the ones that freesurfer create from R1 data.
     recon-all -i ${SUBJECTS_DIR}/../MPM/${occ}/R1_head.nii.gz \
                 -subjid ${occ} \
                 -sd ${SUBJECTS_DIR} \
@@ -122,7 +124,40 @@ else
     cp ${SUBJECTS_DIR}/${occ}/mri/brainmask.mgz \
         ${SUBJECTS_DIR}/${occ}/mri/brainmask.auto.mgz 
 
-    recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -nuintensitycor -autorecon2 -autorecon3
+    recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -nuintensitycor
+
+# If the processing hasn't got to the nu.mgz point, then we'll
+# start it from the beginning.
+# We USED to delete the whole folder...which meant that none of what
+# had been used could be re-used. So now we're just going to
+# run those first few steps again.
+# Note that these steps DO NOT USE MAKE.
+elif [[ ! -f ${SUBJECTS_DIR}/${occ}/nu.mgz ]]; 
+
+    recon-all -subjid ${occ} \
+              -sd ${SUBJECTS_DIR} \
+              -motioncor \
+              -talairach \
+              -normalization \
+              -deface
+
+    mri_convert ${SUBJECTS_DIR}/../MPM/${occ}/R1_brain.nii.gz \
+                ${SUBJECTS_DIR}/${occ}/mri/brainmask.mgz \
+                --conform
+                    
+    cp ${SUBJECTS_DIR}/${occ}/mri/brainmask.mgz \
+        ${SUBJECTS_DIR}/${occ}/mri/brainmask.auto.mgz 
+
+    recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -nuintensitycor
+
+# If the nu.mgz file does exist, run autorecon1 with make
+else
+
+  recon-all -subjid ${occ} \
+              -sd ${SUBJECTS_DIR} \
+              -make all
 
 fi
 
+# For all of the options above, run autorecon2 and autorecon3 with make
+recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -make autorecon2 autorecon3
