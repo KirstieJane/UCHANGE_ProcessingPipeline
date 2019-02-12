@@ -132,7 +132,7 @@ if [[ ! -d ${SUBJECTS_DIR}/${occ} ]]; then
 # had been used could be re-used. So now we're just going to
 # run those first few steps again.
 # Note that these steps DO NOT USE MAKE.
-elif [[ ! -f ${SUBJECTS_DIR}/${occ}/nu.mgz ]]; then
+elif [[ ! -f ${SUBJECTS_DIR}/${occ}/mri/nu.mgz ]]; then
 
     recon-all -subjid ${occ} \
               -sd ${SUBJECTS_DIR} \
