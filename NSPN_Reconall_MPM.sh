@@ -155,9 +155,10 @@ else
 
   recon-all -subjid ${occ} \
               -sd ${SUBJECTS_DIR} \
-              -make all
+              -make autorecon1
 
 fi
 
 # For all of the options above, run autorecon2 and autorecon3 with make
-recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -make autorecon2 autorecon3
+recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -make autorecon2
+recon-all -subjid ${occ} -sd ${SUBJECTS_DIR} -make autorecon3
